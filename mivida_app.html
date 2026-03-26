@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="MiVida">
+<title>MiVida — Luisa Fernanda & Tomás</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --c00:#B8D4C8;--c00l:#EEF6F2;--c00d:#3D6B56;
+  --c01:#B8CDE8;--c01l:#EEF3FB;--c01d:#2D5080;
+  --c02:#C8B8D8;--c02l:#F3EEF8;--c02d:#5A3D6B;
+  --c03:#B8D0C0;--c03l:#EEF5F0;--c03d:#3A5C44;
+  --c04:#D8C8B8;--c04l:#F8F3EE;--c04d:#6B5030;
+  --c05:#C8D8B8;--c05l:#F0F5EE;--c05d:#3D5C28;
+  --c06:#D0C8D8;--c06l:#F5F3F8;--c06d:#4A3D5C;
+  --c07:#B8C8D8;--c07l:#EEF2F8;--c07d:#2D4560;
+  --c08:#D8B8C8;--c08l:#F8EEF3;--c08d:#6B2D4A;
+  --c09:#D4C8B8;--c09l:#F8F3EE;--c09d:#5C4A28;
+  --ct:#B8D8E8;--ctl:#EEF6FB;--ctd:#2D5C70;
+  --bg:#F7F4F0;--surface:#FFFFFF;
+  --text:#2C2820;--muted:#8C8680;
+  --border:rgba(44,40,32,0.09);--border-md:rgba(44,40,32,0.15);
+  --r-sm:8px;--r-md:12px;--r-lg:18px;
+  --shadow:0 1px 3px rgba(44,40,32,0.07),0 4px 12px rgba(44,40,32,0.04);
+}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px;-webkit-font-smoothing:antialiased}
+
+/* LOGIN */
+#login{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px}
+.lw{width:100%;max-width:360px}
+.ltitle{font-family:'DM Serif Display',serif;font-size:34px;color:var(--text);margin-bottom:4px}
+.ltitle span{color:var(--c05d);font-style:italic}
+.lsub{font-size:14px;color:var(--muted);margin-bottom:28px}
+.pcards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.pcard{border-radius:var(--r-lg);padding:20px 14px;text-align:center;cursor:pointer;border:2px solid transparent;transition:all 0.2s;box-shadow:var(--shadow);background:var(--surface)}
+.pcard:hover{transform:translateY(-3px)}
+.pavatar{width:52px;height:52px;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:20px}
+.pname{font-size:14px;font-weight:500;margin-bottom:3px}
+.prole{font-size:11px;color:var(--muted)}
+.pin-section{display:none;text-align:center;margin-top:4px}
+.pin-lbl{font-size:13px;color:var(--muted);margin-bottom:12px}
+.pin-dots{display:flex;gap:10px;justify-content:center;margin-bottom:16px}
+.pdot{width:13px;height:13px;border-radius:50%;border:2px solid var(--border-md);transition:background 0.15s}
+.pdot.filled{background:var(--c02d);border-color:var(--c02d)}
+.numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:210px;margin:0 auto}
+.nbtn{aspect-ratio:1;border-radius:50%;border:1px solid var(--border-md);background:var(--surface);font-size:18px;color:var(--text);cursor:pointer;font-family:'DM Sans';transition:background 0.12s;display:flex;align-items:center;justify-content:center}
+.nbtn:hover{background:var(--bg)}
+.skip{font-size:12px;color:var(--muted);margin-top:12px;cursor:pointer;text-decoration:underline}
+
+/* APP */
+#app{display:none;height:100vh;flex-direction:column}
+#app.on{display:flex}
+
+/* TOPBAR */
+.topbar{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:11px 16px;background:var(--surface);border-bottom:1px solid var(--border)}
+.tlogo{font-family:'DM Serif Display',serif;font-size:19px}
+.tlogo span{font-style:italic;color:var(--c05d)}
+.tright{display:flex;align-items:center;gap:7px}
+.tav{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:13px;cursor:pointer;border:2px solid transparent;transition:border 0.15s}
+.tav.alf{border-color:var(--c02d)}
+.tav.at{border-color:var(--ctd)}
+.iapill{display:flex;align-items:center;gap:5px;border-radius:20px;padding:4px 11px;font-size:11px;cursor:pointer;border:none;font-family:'DM Sans';transition:background 0.15s}
+.pulse{width:6px;height:6px;border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.logbtn{font-size:11px;color:var(--muted);cursor:pointer;padding:3px 8px;border-radius:6px;background:none;border:1px solid var(--border-md);font-family:'DM Sans'}
+
+/* SCROLL */
+.scroll{flex:1;overflow-y:auto;padding:14px;-webkit-overflow-scrolling:touch}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px 15px;box-shadow:var(--shadow)}
+.chd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.ctitle{font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em}
+.cbtn{font-size:11px;color:var(--muted);cursor:pointer;padding:3px 8px;border-radius:6px;border:1px solid var(--border);background:none;font-family:'DM Sans'}
+
+/* IA Banner */
+.iabanner{border-radius:var(--r-lg);padding:13px 15px;display:flex;gap:11px;align-items:flex-start;margin-bottom:14px}
+.iaicon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.iabody strong{font-size:13px;display:block;margin-bottom:3px}
+.iabody p{font-size:12px;opacity:0.82;line-height:1.5}
+.iabtns{display:flex;gap:5px;margin-top:7px;flex-wrap:wrap}
+.iabtn{font-size:11px;padding:3px 9px;border-radius:7px;background:white;border:1px solid;cursor:pointer;font-family:'DM Sans'}
+
+/* Stats */
+.srow{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:14px}
+.sc{border-radius:var(--r-md);padding:12px 13px;border:1px solid transparent}
+.sc .sl{font-size:10px;font-weight:500;opacity:0.6;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px}
+.sc .sv{font-family:'DM Serif Display',serif;font-size:22px;line-height:1;margin-bottom:3px}
+.sc .ss{font-size:10px;opacity:0.58}
+
+/* Grid layouts */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}
+.gmain{display:grid;grid-template-columns:1fr 270px;gap:12px;margin-bottom:12px}
+
+/* Calendar */
+.mcg{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.mcdn{text-align:center;font-size:10px;color:var(--muted);padding:3px 0}
+.mcd{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:3px;border-radius:6px;cursor:pointer;font-size:11px;color:var(--text)}
+.mcd:hover{background:var(--bg)}
+.mcd.today{background:var(--c02d);color:white;border-radius:50%}
+.mcd.sel{background:var(--c02l);border-radius:50%}
+.mcd.om{opacity:0.28}
+.edots{display:flex;gap:2px;margin-top:1px}
+.edot{width:3px;height:3px;border-radius:50%}
+.evlist{margin-top:10px}
+.evdtitle{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px}
+.evrow{display:flex;gap:7px;margin-bottom:5px;align-items:center}
+.evtime{font-size:10px;color:var(--muted);width:32px;flex-shrink:0;text-align:right}
+.evblock{flex:1;padding:5px 9px;border-radius:7px;font-size:12px;font-weight:500;display:flex;align-items:center;justify-content:space-between}
+.evtag{font-size:10px;opacity:0.65;font-weight:400}
+
+/* Tasks */
+.tabs{display:flex;gap:0;margin-bottom:9px;background:var(--bg);border-radius:7px;padding:3px}
+.tab{flex:1;padding:4px 6px;text-align:center;font-size:11px;color:var(--muted);cursor:pointer;border-radius:5px;transition:all 0.12s}
+.tab.active{background:white;color:var(--text);font-weight:500}
+.ti{display:flex;gap:9px;padding:7px 0;border-bottom:1px solid var(--border);align-items:flex-start;cursor:pointer}
+.ti:last-child{border-bottom:none}
+.tck{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--border-md);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+.tck.done{border-color:transparent}
+.tck.done::after{content:'';width:6px;height:4px;border-left:2px solid white;border-bottom:2px solid white;transform:rotate(-45deg) translateY(-1px);display:block}
+.tlbl{font-size:13px;line-height:1.4;flex:1}
+.tlbl.done{text-decoration:line-through;color:var(--muted)}
+.tchip{font-size:10px;padding:2px 7px;border-radius:6px;font-weight:500;display:inline-block;margin-top:2px}
+.addbtn{width:100%;margin-top:8px;padding:6px;border:1.5px dashed var(--border-md);background:none;border-radius:var(--r-sm);font-size:12px;color:var(--muted);cursor:pointer;font-family:'DM Sans'}
+.addbtn:hover{background:var(--bg)}
+
+/* Modules */
+.modsGrid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
+.modcard{border-radius:var(--r-md);padding:11px 9px;cursor:pointer;transition:transform 0.15s;border:1px solid transparent}
+.modcard:hover{transform:translateY(-2px)}
+.modnum{font-size:9px;opacity:0.55;font-weight:500;margin-bottom:3px}
+.modico{font-size:20px;margin-bottom:3px}
+.modname{font-size:10px;font-weight:500;line-height:1.3}
+.modct{font-size:9px;opacity:0.5;margin-top:1px}
+
+/* Salud bars */
+.srow2{display:flex;align-items:center;gap:7px;margin-bottom:6px}
+.slbl{font-size:12px;flex:1;color:var(--muted)}
+.bw{width:65px;height:5px;background:var(--bg);border-radius:10px;overflow:hidden}
+.bf{height:100%;border-radius:10px}
+.bval{font-size:11px;font-weight:500;width:28px;text-align:right}
+
+/* Finanzas */
+.fr{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px}
+.fr:last-child{border-bottom:none}
+.flbl{color:var(--muted)}
+.fpos{color:#3A5C44;font-weight:500}
+.fneg{color:#8B3A3A;font-weight:500}
+
+/* Progress */
+.prw{display:flex;align-items:center;gap:12px}
+.rw{position:relative;width:58px;height:58px;flex-shrink:0}
+.rw svg{transform:rotate(-90deg)}
+.rc{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.rpct{font-family:'DM Serif Display',serif;font-size:14px;line-height:1}
+.rsub{font-size:8px;color:var(--muted)}
+.rdet{flex:1}
+.rdrow{font-size:12px;display:flex;justify-content:space-between;padding:2px 0}
+.rdval{font-weight:500}
+
+/* Matas */
+.matasgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.matacard{background:var(--c05l);border:1px solid var(--c05);border-radius:var(--r-sm);padding:7px 5px;text-align:center;cursor:pointer}
+.matacard:hover{background:var(--c05)}
+.mataem{font-size:18px;margin-bottom:2px}
+.matanm{font-size:10px;font-weight:500;color:var(--c05d)}
+.mataw{font-size:9px;color:var(--c05d);opacity:0.6}
+
+/* Hijo */
+.hijoitem{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px}
+.hijoitem:last-child{border-bottom:none}
+.hijodot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+
+/* TOMÁS VIEW */
+.theader{border-radius:var(--r-lg);padding:16px;margin-bottom:12px;display:flex;align-items:center;gap:13px}
+.tavatar{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:20px;flex-shrink:0}
+.tname{font-family:'DM Serif Display',serif;font-size:19px}
+.tsub{font-size:11px;opacity:0.7;margin-top:2px}
+.tstreak{font-size:12px;margin-top:5px}
+.ttask{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:var(--r-md);margin-bottom:5px;cursor:pointer;transition:all 0.15s;border:1px solid transparent;background:var(--surface);box-shadow:var(--shadow)}
+.ttask:hover{transform:translateX(2px)}
+.ttask.tdone{opacity:0.5}
+.tcbig{width:20px;height:20px;border-radius:50%;border:2px solid var(--border-md);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+.tcbig.done{border-color:transparent}
+.tcbig.done::after{content:'';width:7px;height:4px;border-left:2.5px solid white;border-bottom:2.5px solid white;transform:rotate(-45deg) translateY(-1px);display:block}
+.tlblt{font-size:13px;flex:1}
+.tlblt.done{text-decoration:line-through;color:var(--muted)}
+.tsubj{font-size:10px;font-weight:500;padding:2px 7px;border-radius:5px}
+.tev{display:flex;align-items:center;gap:9px;padding:8px 11px;border-radius:var(--r-md);margin-bottom:5px;background:var(--surface);border:1px solid var(--border)}
+.tevtime{font-size:11px;color:var(--muted);width:34px;font-weight:500}
+.tevdot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.tevlbl{font-size:13px;font-weight:500;flex:1}
+.pbrow{margin-bottom:7px}
+.pblbl{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:3px}
+.pbval{font-weight:500}
+.pbwrap{height:6px;background:var(--bg);border-radius:10px;overflow:hidden}
+.pbfill{height:100%;border-radius:10px;transition:width 0.5s}
+
+/* Modal */
+.movl{position:fixed;inset:0;background:rgba(44,40,32,0.35);z-index:50;display:none;align-items:flex-end;justify-content:center}
+.movl.open{display:flex}
+.msheet{background:var(--surface);border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:480px;animation:sup 0.22s ease}
+@keyframes sup{from{transform:translateY(50px);opacity:0}to{transform:translateY(0);opacity:1}}
+.mtitle{font-size:15px;font-weight:500;margin-bottom:13px;display:flex;justify-content:space-between;align-items:center}
+.mclose{background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted)}
+.minput{width:100%;padding:9px 11px;border:1px solid var(--border-md);border-radius:var(--r-sm);font-size:14px;font-family:'DM Sans';color:var(--text);background:var(--bg);margin-bottom:9px;outline:none}
+.minput:focus{border-color:var(--c02)}
+.msel{width:100%;padding:9px 11px;border:1px solid var(--border-md);border-radius:var(--r-sm);font-size:13px;font-family:'DM Sans';color:var(--text);background:var(--bg);margin-bottom:13px;outline:none}
+.msub{width:100%;padding:10px;border:none;border-radius:var(--r-md);font-size:14px;font-family:'DM Sans';cursor:pointer;font-weight:500;color:white}
+
+/* Bottom nav */
+.botnav{flex-shrink:0;display:none;align-items:center;justify-content:space-around;padding:6px 0 10px;background:var(--surface);border-top:1px solid var(--border)}
+.bni{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:4px 10px;border-radius:7px;color:var(--muted);font-size:10px;border:none;background:none;font-family:'DM Sans'}
+.bni.active{color:var(--c02d)}
+.bnicon{font-size:17px}
+
+/* Módulo Modal */
+.modovl{position:fixed;inset:0;background:rgba(44,40,32,0.4);z-index:60;display:none;align-items:flex-end;justify-content:center;padding:0}
+.modovl.open{display:flex}
+.modsheet{
+  background:var(--surface);border-radius:22px 22px 0 0;
+  width:100%;max-width:680px;max-height:88vh;
+  display:flex;flex-direction:column;
+  animation:sup 0.25s ease;
+}
+.modsheet-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 20px 14px;border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.modsheet-title{font-family:'DM Serif Display',serif;font-size:20px}
+.modsheet-close{background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);padding:0 4px}
+.modsheet-body{overflow-y:auto;padding:18px 20px;flex:1}
+
+/* Mapa General styles */
+.norte-card{
+  border-radius:var(--r-lg);padding:16px 18px;margin-bottom:16px;
+  background:var(--c05l);border:1px solid var(--c05);
+  text-align:center;
+}
+.norte-year{font-family:'DM Serif Display',serif;font-size:22px;color:var(--c05d);margin-bottom:6px}
+.norte-text{font-size:13px;color:var(--c05d);line-height:1.6;opacity:0.85}
+.norte-sub{font-size:11px;color:var(--c05d);opacity:0.6;margin-top:4px;font-style:italic}
+.eje-card{border-radius:var(--r-md);padding:13px 15px;margin-bottom:10px;border:1px solid transparent}
+.eje-title{font-size:14px;font-weight:500;margin-bottom:10px}
+.eje-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.eje-col-title{font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:0.06em;opacity:0.6;margin-bottom:5px}
+.eje-item{font-size:11px;line-height:1.5;opacity:0.85}
+.ritmo-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.ritmo-item{background:var(--bg);border-radius:var(--r-sm);padding:9px 11px}
+.ritmo-mes{font-size:10px;font-weight:500;color:var(--muted);margin-bottom:2px}
+.ritmo-desc{font-size:12px;color:var(--text)}
+.frase-item{font-size:13px;color:var(--text);padding:8px 0;border-bottom:1px solid var(--border);font-style:italic}
+.frase-item:last-child{border-bottom:none}
+.revision-steps{counter-reset:step}
+.rev-step{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);align-items:flex-start;font-size:13px}
+.rev-step:last-child{border-bottom:none}
+.rev-num{width:22px;height:22px;border-radius:50%;background:var(--c05l);color:var(--c05d);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;flex-shrink:0}
+.section-title{font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin:16px 0 8px}
+
+/* Responsive */
+@media(max-width:720px){
+  .gmain{grid-template-columns:1fr}
+  .g2{grid-template-columns:1fr}
+  .g3{grid-template-columns:1fr 1fr}
+  .srow{grid-template-columns:1fr 1fr}
+  .modsGrid{grid-template-columns:repeat(3,1fr)}
+  .botnav{display:flex}
+  .scroll{padding:11px}
+}
+@media(max-width:420px){
+  .modsGrid{grid-template-columns:repeat(2,1fr)}
+  .g3{grid-template-columns:1fr}
+  .matasgrid{grid-template-columns:repeat(3,1fr)}
+}
+.hidden{display:none!important}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-thumb{background:var(--border-md);border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="lw">
+    <div class="ltitle">mi<span>vida</span> 🌿</div>
+    <div class="lsub">¿Quién eres hoy?</div>
+    <div class="pcards">
+      <div class="pcard" id="clf" onclick="selProfile('lf')" style="border-color:var(--c02)">
+        <div class="pavatar" style="background:var(--c02l);color:var(--c02d)">LF</div>
+        <div class="pname">Luisa Fernanda</div>
+        <div class="prole">Mamá · Psicóloga · Estudiante</div>
+      </div>
+      <div class="pcard" id="ct" onclick="selProfile('t')" style="border-color:var(--ct)">
+        <div class="pavatar" style="background:var(--ctl);color:var(--ctd)">T</div>
+        <div class="pname">Tomás</div>
+        <div class="prole">10 años · Estudiante</div>
+      </div>
+    </div>
+    <div class="pin-section" id="pinsec">
+      <div class="pin-lbl" id="pinlbl">Ingresa tu PIN</div>
+      <div class="pin-dots" id="pindots">
+        <div class="pdot"></div><div class="pdot"></div>
+        <div class="pdot"></div><div class="pdot"></div>
+      </div>
+      <div class="numpad">
+        <button class="nbtn" onclick="addPin('1')">1</button>
+        <button class="nbtn" onclick="addPin('2')">2</button>
+        <button class="nbtn" onclick="addPin('3')">3</button>
+        <button class="nbtn" onclick="addPin('4')">4</button>
+        <button class="nbtn" onclick="addPin('5')">5</button>
+        <button class="nbtn" onclick="addPin('6')">6</button>
+        <button class="nbtn" onclick="addPin('7')">7</button>
+        <button class="nbtn" onclick="addPin('8')">8</button>
+        <button class="nbtn" onclick="addPin('9')">9</button>
+        <button class="nbtn" onclick="clearPin()" style="font-size:13px">⌫</button>
+        <button class="nbtn" onclick="addPin('0')">0</button>
+        <button class="nbtn" onclick="skipPin()" style="font-size:11px;color:var(--muted)">↵</button>
+      </div>
+      <div class="skip" onclick="skipPin()">Entrar sin PIN</div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="topbar">
+    <div class="tlogo">mi<span>vida</span></div>
+    <div class="tright">
+      <div class="iapill" id="iapill"><div class="pulse" id="iapulse"></div><span id="iatext">IA activa</span></div>
+      <div class="tav" id="avlf" onclick="switchTo('lf')" style="background:var(--c02l);color:var(--c02d)">LF</div>
+      <div class="tav" id="avt" onclick="switchTo('t')" style="background:var(--ctl);color:var(--ctd)">T</div>
+      <button class="logbtn" onclick="logout()">salir</button>
+    </div>
+  </div>
+
+  <div class="scroll" id="scr">
+
+    <!-- ══ VISTA LF ══ -->
+    <div id="vlf">
+
+      <div class="iabanner" style="background:var(--c02l);border:1px solid var(--c02)">
+        <div class="iaicon" style="background:var(--c02)">✨</div>
+        <div class="iabody" style="color:var(--c02d)">
+          <strong>Buenos días, Luisa Fernanda 🌸</strong>
+          <p>Tienes 2 pacientes hoy (3pm y 4:30pm), entrega de especialización el viernes y el partido de Tomás el sábado. Sugerencia: usa 12–1pm para leer el capítulo 3.</p>
+          <div class="iabtns">
+            <button class="iabtn" style="border-color:var(--c02);color:var(--c02d)">Reorganizar semana</button>
+            <button class="iabtn" style="border-color:var(--c02);color:var(--c02d)">Tips TDAH 🧠</button>
+            <button class="iabtn" style="border-color:var(--c02);color:var(--c02d)">Modo calma 🌿</button>
+            <button class="iabtn" style="border-color:var(--c02);color:var(--c02d)">Check-in emocional</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="srow">
+        <div class="sc" style="background:var(--c03l);border-color:var(--c03);color:var(--c03d)"><div class="sl">Trabajo</div><div class="sv">2</div><div class="ss">turnos + pacientes</div></div>
+        <div class="sc" style="background:var(--c09l);border-color:var(--c09);color:var(--c09d)"><div class="sl">Especialización</div><div class="sv">68%</div><div class="ss">entrega en 2 días</div></div>
+        <div class="sc" style="background:var(--c02l);border-color:var(--c02);color:var(--c02d)"><div class="sl">Bienestar</div><div class="sv">7/10</div><div class="ss">registrado hoy</div></div>
+      </div>
+
+      <div class="gmain">
+        <div class="card">
+          <div class="chd">
+            <span class="ctitle">Calendario</span>
+            <div style="display:flex;gap:4px;align-items:center">
+              <button class="cbtn" onclick="changeMonth(-1)">‹</button>
+              <span id="calmonth" style="font-size:12px;font-weight:500;color:var(--text)">marzo 2026</span>
+              <button class="cbtn" onclick="changeMonth(1)">›</button>
+            </div>
+          </div>
+          <div class="mcg" id="calDn"></div>
+          <div class="mcg" id="calGrid" style="margin-top:2px"></div>
+          <div class="evlist">
+            <div class="evdtitle" id="evTitle">Hoy · miércoles 25</div>
+            <div id="evList"></div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:11px">
+          <div class="card">
+            <div class="chd">
+              <span class="ctitle">Tareas del día</span>
+              <button class="cbtn" onclick="openModal()">+ nueva</button>
+            </div>
+            <div class="tabs">
+              <div class="tab active" onclick="ftask(this,'todas')">Todas</div>
+              <div class="tab" onclick="ftask(this,'pend')">Pend.</div>
+              <div class="tab" onclick="ftask(this,'done')">✓</div>
+            </div>
+            <div id="tasklist"></div>
+          </div>
+          <div class="card" style="border-color:var(--c00);background:var(--c00l)">
+            <div class="chd">
+              <span class="ctitle" style="color:var(--c00d)">👦 Tomás — supervisión</span>
+              <button class="cbtn" onclick="switchTo('t')" style="color:var(--c00d);border-color:var(--c00)">ver su vista</button>
+            </div>
+            <div id="supervision"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:12px">
+        <div class="chd"><span class="ctitle">Módulos · acceso rápido</span></div>
+        <div class="modsGrid" id="modsGrid"></div>
+      </div>
+
+      <div class="g3">
+        <div class="card" style="border-color:var(--c02);background:var(--c02l)">
+          <div class="chd"><span class="ctitle" style="color:var(--c02d)">02 · Salud</span></div>
+          <div class="srow2"><span class="slbl">Energía</span><div class="bw"><div class="bf" style="width:65%;background:var(--c02)"></div></div><span class="bval" style="color:var(--c02d)">6.5</span></div>
+          <div class="srow2"><span class="slbl">Ánimo</span><div class="bw"><div class="bf" style="width:70%;background:var(--c02)"></div></div><span class="bval" style="color:var(--c02d)">7</span></div>
+          <div class="srow2"><span class="slbl">Sueño</span><div class="bw"><div class="bf" style="width:55%;background:var(--c02)"></div></div><span class="bval" style="color:var(--c02d)">5.5</span></div>
+          <div class="srow2"><span class="slbl">Ansiedad</span><div class="bw"><div class="bf" style="width:28%;background:var(--c05)"></div></div><span class="bval" style="color:var(--c05d)">baja</span></div>
+          <div style="margin-top:8px;font-size:11px;color:var(--c02d);opacity:0.7">💊 Medicación: ✓ tomada hoy</div>
+        </div>
+        <div class="card" style="border-color:var(--c01)">
+          <div class="chd"><span class="ctitle" style="color:var(--c01d)">01 · Finanzas</span></div>
+          <div class="fr"><span class="flbl">Hospital</span><span class="fpos">+$3.200k</span></div>
+          <div class="fr"><span class="flbl">Consultorio</span><span class="fpos">+$1.800k</span></div>
+          <div class="fr"><span class="flbl">Especialización</span><span class="fneg">-$980k</span></div>
+          <div class="fr"><span class="flbl">Hogar + Tomás</span><span class="fneg">-$1.500k</span></div>
+          <div class="fr" style="border-top:1px solid var(--c01);padding-top:6px;margin-top:2px"><span class="flbl" style="font-weight:500;color:var(--text)">Disponible</span><span class="fpos" style="font-size:14px">$2.520k</span></div>
+        </div>
+        <div class="card" style="border-color:var(--c05);background:var(--c05l)">
+          <div class="chd"><span class="ctitle" style="color:var(--c05d)">05 · Mis matas 🌿</span></div>
+          <div class="matasgrid" id="matasGrid"></div>
+          <div style="margin-top:7px;font-size:11px;color:var(--c05d);text-align:center;opacity:0.7">Regar hoy: Pothos · Helecho</div>
+        </div>
+      </div>
+
+      <div class="g2">
+        <div class="card" style="border-color:var(--c09)">
+          <div class="chd"><span class="ctitle" style="color:var(--c09d)">09 · Especialización</span></div>
+          <div class="prw">
+            <div class="rw">
+              <svg width="58" height="58" viewBox="0 0 58 58">
+                <circle cx="29" cy="29" r="23" fill="none" stroke="#E8E0D0" stroke-width="5"/>
+                <circle cx="29" cy="29" r="23" fill="none" stroke="var(--c09)" stroke-width="5" stroke-dasharray="144.5" stroke-dashoffset="46" stroke-linecap="round"/>
+              </svg>
+              <div class="rc"><span class="rpct" style="color:var(--c09d)">68%</span><span class="rsub">avance</span></div>
+            </div>
+            <div class="rdet">
+              <div class="rdrow"><span style="color:var(--muted)">Módulos</span><span class="rdval">8/12</span></div>
+              <div class="rdrow"><span style="color:var(--muted)">Entrega</span><span class="rdval" style="color:#8B3A3A">vier 27</span></div>
+              <div class="rdrow"><span style="color:var(--muted)">Clase</span><span class="rdval">jue 6pm</span></div>
+            </div>
+          </div>
+          <div style="margin-top:10px">
+            <div class="ti"><div class="tck" style="border-color:var(--c09)"></div><div><div class="tlbl">Leer capítulo 3 — evaluación</div></div></div>
+            <div class="ti"><div class="tck done" style="background:var(--c09)"></div><div><div class="tlbl done">Foro semana 6</div></div></div>
+            <div class="ti" style="border:none"><div class="tck" style="border-color:var(--c09)"></div><div><div class="tlbl">Borrador trabajo final</div></div></div>
+          </div>
+        </div>
+        <div class="card" style="border-color:var(--c03)">
+          <div class="chd"><span class="ctitle" style="color:var(--c03d)">03 · Consultorio + hospital</span></div>
+          <div style="padding:7px 10px;background:var(--c03l);border-radius:var(--r-sm);font-size:12px;color:var(--c03d);margin-bottom:10px">🏥 Turno: 8:30am – 12:30pm</div>
+          <div class="ti">
+            <div style="width:32px;height:32px;border-radius:50%;background:var(--c03l);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--c03d);font-weight:500;flex-shrink:0">15h</div>
+            <div><div style="font-size:13px;font-weight:500">Paciente A.</div><div style="font-size:11px;color:var(--muted)">Sesión 4 · duelo</div></div>
+          </div>
+          <div class="ti" style="border:none">
+            <div style="width:32px;height:32px;border-radius:50%;background:var(--c03l);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--c03d);font-weight:500;flex-shrink:0">16h</div>
+            <div><div style="font-size:13px;font-weight:500">Paciente B.</div><div style="font-size:11px;color:var(--muted)">Sesión 7 · ansiedad</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /vlf -->
+
+    <!-- ══ VISTA TOMÁS ══ -->
+    <div id="vt" class="hidden">
+
+      <div class="theader" style="background:var(--ctl);border:1px solid var(--ct)">
+        <div class="tavatar" style="background:var(--ct);color:var(--ctd)">T</div>
+        <div style="color:var(--ctd)">
+          <div class="tname">¡Hola, Tomás! 👋</div>
+          <div class="tsub">Miércoles 25 de marzo · 10 años</div>
+          <div class="tstreak">🔥 Racha de 4 días completando tareas</div>
+        </div>
+      </div>
+
+      <div class="srow">
+        <div class="sc" style="background:var(--ctl);border-color:var(--ct);color:var(--ctd)"><div class="sl">Tareas hoy</div><div class="sv" id="tcnt">3</div><div class="ss">pendientes</div></div>
+        <div class="sc" style="background:var(--c05l);border-color:var(--c05);color:var(--c05d)"><div class="sl">Racha</div><div class="sv">4🔥</div><div class="ss">días seguidos</div></div>
+        <div class="sc" style="background:var(--c09l);border-color:var(--c09);color:var(--c09d)"><div class="sl">Esta semana</div><div class="sv">8</div><div class="ss">tareas hechas</div></div>
+      </div>
+
+      <div class="card" style="margin-bottom:11px">
+        <div class="chd">
+          <span class="ctitle" style="color:var(--ctd)">📚 Mis tareas del colegio</span>
+          <button class="cbtn" onclick="openModalT()">+ agregar</button>
+        </div>
+        <div id="tlistt"></div>
+      </div>
+
+      <div class="card" style="margin-bottom:11px">
+        <div class="chd"><span class="ctitle" style="color:var(--ctd)">📅 Mi semana</span></div>
+        <div id="tevlist"></div>
+      </div>
+
+      <div class="card" style="background:var(--c00l);border-color:var(--c00);margin-bottom:11px">
+        <div class="chd"><span class="ctitle" style="color:var(--c00d)">💌 Mensaje de mamá</span></div>
+        <div style="font-size:14px;color:var(--c00d);line-height:1.6;font-family:'DM Serif Display',serif;font-style:italic">"Tomás, recuerda llevar tu cuaderno de matemáticas mañana. Te quiero mucho 🌿"</div>
+      </div>
+
+      <div class="card" style="border-color:var(--c05);margin-bottom:11px">
+        <div class="chd"><span class="ctitle" style="color:var(--c05d)">🎯 Mis metas de la semana</span></div>
+        <div class="pbrow">
+          <div class="pblbl"><span>Tareas completadas</span><span class="pbval" style="color:var(--c05d)">8/10</span></div>
+          <div class="pbwrap"><div class="pbfill" style="width:80%;background:var(--c05)"></div></div>
+        </div>
+        <div class="pbrow">
+          <div class="pblbl"><span>Lectura diaria</span><span class="pbval" style="color:var(--c09d)">4/5</span></div>
+          <div class="pbwrap"><div class="pbfill" style="width:80%;background:var(--c09)"></div></div>
+        </div>
+        <div class="pbrow">
+          <div class="pblbl"><span>Cuarto ordenado</span><span class="pbval" style="color:var(--ctd)">3/5</span></div>
+          <div class="pbwrap"><div class="pbfill" style="width:60%;background:var(--ct)"></div></div>
+        </div>
+      </div>
+
+    </div><!-- /vt -->
+  </div><!-- /scroll -->
+
+  <div class="botnav" id="bnav">
+    <button class="bni active"><div class="bnicon">🏠</div>Inicio</button>
+    <button class="bni"><div class="bnicon">📅</div>Calendario</button>
+    <button class="bni"><div class="bnicon">✅</div>Tareas</button>
+    <button class="bni"><div class="bnicon">📁</div>Módulos</button>
+    <button class="bni"><div class="bnicon">💙</div>Salud</button>
+  </div>
+</div>
+
+<!-- MODAL MÓDULO -->
+<div class="modovl" id="modovl" onclick="closeModModal(event)">
+  <div class="modsheet" id="modsheet">
+    <div class="modsheet-header">
+      <div class="modsheet-title" id="modsheet-title">Módulo</div>
+      <button class="modsheet-close" onclick="closeModModal()">×</button>
+    </div>
+    <div class="modsheet-body" id="modsheet-body"></div>
+  </div>
+</div>
+
+<!-- MODAL LF -->
+<div class="movl" id="modal">
+  <div class="msheet">
+    <div class="mtitle">Nueva tarea <button class="mclose" onclick="closeModal()">×</button></div>
+    <input class="minput" id="minput" placeholder="¿Qué necesitas hacer?"/>
+    <select class="msel" id="mcat">
+      <option>Consultorio</option><option>Hospital</option><option>Estudio</option>
+      <option>Mamá</option><option>Finanzas</option><option>Salud</option>
+      <option>Hogar</option><option>Matas</option>
+    </select>
+    <button class="msub" style="background:var(--c02d)" onclick="addTaskLF()">Agregar tarea</button>
+  </div>
+</div>
+
+<!-- MODAL TOMÁS -->
+<div class="movl" id="modalt">
+  <div class="msheet">
+    <div class="mtitle">Tarea de Tomás <button class="mclose" onclick="closeModalT()">×</button></div>
+    <input class="minput" id="mtinput" placeholder="¿Qué tarea tienes?"/>
+    <select class="msel" id="mtcat">
+      <option>Matemáticas</option><option>Español</option><option>Ciencias</option>
+      <option>Sociales</option><option>Educación física</option><option>Arte</option><option>Personal</option>
+    </select>
+    <button class="msub" style="background:var(--ctd)" onclick="addTaskT()">Agregar</button>
+  </div>
+</div>
+
+<script>
+const MONTHS=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const DN=['do','lu','ma','mi','ju','vi','sá'];
+const DNF=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+
+let activeP='lf', selP='', pinIn='';
+let cy=2026, cm=2, sd=25, tf='todas';
+
+let TLF=[
+  {t:'Confirmar pacientes del jueves',c:'Consultorio',cb:'var(--c03l)',cc:'var(--c03d)',done:true,p:'normal'},
+  {t:'Leer capítulo 3 — especialización',c:'Estudio',cb:'var(--c09l)',cc:'var(--c09d)',done:false,p:'alta'},
+  {t:'Comprar cuaderno de Tomás',c:'Mamá',cb:'var(--c00l)',cc:'var(--c00d)',done:false,p:'normal'},
+  {t:'Abonar la pothos y helecho',c:'Matas',cb:'var(--c05l)',cc:'var(--c05d)',done:false,p:'baja'},
+  {t:'Revisar historia clínica paciente nuevo',c:'Hospital',cb:'var(--c03l)',cc:'var(--c03d)',done:false,p:'alta'},
+  {t:'Pagar factura del consultorio',c:'Finanzas',cb:'var(--c01l)',cc:'var(--c01d)',done:false,p:'normal'},
+  {t:'Tomar medicación de la noche',c:'Salud',cb:'var(--c02l)',cc:'var(--c02d)',done:false,p:'alta'},
+];
+
+let TT=[
+  {t:'Tarea de matemáticas — cap. 5',c:'Matemáticas',cb:'var(--c09l)',cc:'var(--c09d)',done:false},
+  {t:'Leer 20 minutos',c:'Español',cb:'var(--c07l)',cc:'var(--c07d)',done:true},
+  {t:'Estudiar quiz de ciencias',c:'Ciencias',cb:'var(--c03l)',cc:'var(--c03d)',done:false},
+  {t:'Ordenar el cuarto',c:'Personal',cb:'var(--ctl)',cc:'var(--ctd)',done:false},
+];
+
+const EVS={
+  25:[
+    {t:'7:00',l:'Llevar a Tomás al colegio',bg:'var(--c00l)',col:'var(--c00d)',tag:'mamá'},
+    {t:'8:30',l:'Turno hospital',bg:'var(--c03l)',col:'var(--c03d)',tag:'hospital'},
+    {t:'12:00',l:'Almuerzo · lectura esp.',bg:'var(--c09l)',col:'var(--c09d)',tag:'estudio'},
+    {t:'15:00',l:'Paciente consultorio',bg:'var(--c03l)',col:'var(--c03d)',tag:'consultorio'},
+    {t:'16:30',l:'Paciente consultorio',bg:'var(--c03l)',col:'var(--c03d)',tag:'consultorio'},
+    {t:'19:00',l:'Regar matas 🌿',bg:'var(--c05l)',col:'var(--c05d)',tag:'hobbies'},
+  ],
+  26:[{t:'8:30',l:'Turno hospital',bg:'var(--c03l)',col:'var(--c03d)',tag:'hospital'},{t:'18:00',l:'Clase especialización',bg:'var(--c09l)',col:'var(--c09d)',tag:'estudio'}],
+  27:[{t:'9:00',l:'Supervisión consultorio',bg:'var(--c03l)',col:'var(--c03d)',tag:'consultorio'},{t:'16:00',l:'⚠️ Entrega trabajo',bg:'var(--c09l)',col:'#8B3A3A',tag:'estudio'}],
+  28:[{t:'8:30',l:'Turno hospital',bg:'var(--c03l)',col:'var(--c03d)',tag:'hospital'},{t:'17:00',l:'Tarde con Tomás',bg:'var(--c00l)',col:'var(--c00d)',tag:'mamá'}],
+  29:[{t:'10:00',l:'Partido de fútbol Tomás ⚽',bg:'var(--c00l)',col:'var(--c00d)',tag:'mamá'}],
+};
+
+const EVT=[
+  {t:'7:30',l:'Salida al colegio',col:'var(--ctd)',bg:'var(--ctl)'},
+  {t:'14:00',l:'Llegada a casa',col:'var(--ctd)',bg:'var(--ctl)'},
+  {t:'15:00',l:'Merienda + tareas',col:'var(--c09d)',bg:'var(--c09l)'},
+  {t:'17:00',l:'Tiempo libre 🎮',col:'var(--c05d)',bg:'var(--c05l)'},
+  {t:'Sáb',l:'Partido de fútbol ⚽',col:'var(--c03d)',bg:'var(--c03l)'},
+];
+
+const MODS=[
+  {n:'00',i:'🗺️',nm:'Mapa general',ct:'5 docs',bg:'var(--c00l)',bd:'var(--c00)',co:'var(--c00d)'},
+  {n:'01',i:'💰',nm:'Finanzas',ct:'12 arch.',bg:'var(--c01l)',bd:'var(--c01)',co:'var(--c01d)'},
+  {n:'02',i:'🫀',nm:'Salud',ct:'8 arch.',bg:'var(--c02l)',bd:'var(--c02)',co:'var(--c02d)'},
+  {n:'03',i:'💼',nm:'Trabajo',ct:'24 arch.',bg:'var(--c03l)',bd:'var(--c03)',co:'var(--c03d)'},
+  {n:'04',i:'🏡',nm:'Hogar',ct:'9 arch.',bg:'var(--c04l)',bd:'var(--c04)',co:'var(--c04d)'},
+  {n:'05',i:'🌿',nm:'Hobbies',ct:'6 arch.',bg:'var(--c05l)',bd:'var(--c05)',co:'var(--c05d)'},
+  {n:'06',i:'📦',nm:'Archivo',ct:'30+ arch.',bg:'var(--c06l)',bd:'var(--c06)',co:'var(--c06d)'},
+  {n:'07',i:'📄',nm:'Docs acad.',ct:'15 arch.',bg:'var(--c07l)',bd:'var(--c07)',co:'var(--c07d)'},
+  {n:'08',i:'⚖️',nm:'Demandas',ct:'3 arch.',bg:'var(--c08l)',bd:'var(--c08)',co:'var(--c08d)'},
+  {n:'09',i:'📚',nm:'Estudio',ct:'18 arch.',bg:'var(--c09l)',bd:'var(--c09)',co:'var(--c09d)'},
+];
+
+const MATAS=[
+  {e:'🪴',n:'Pothos',w:'hoy'},{e:'🌿',n:'Helecho',w:'hoy'},
+  {e:'🌵',n:'Suculenta',w:'dom'},{e:'🌸',n:'Orquídea',w:'vier'},
+  {e:'🌱',n:'Albahaca',w:'lun'},{e:'🍃',n:'Monstera',w:'sáb'},
+  {e:'🌺',n:'Begonia',w:'jue'},{e:'➕',n:'Nueva',w:''},
+];
+
+const CATMAP={
+  'Consultorio':['var(--c03l)','var(--c03d)'],'Hospital':['var(--c03l)','var(--c03d)'],
+  'Estudio':['var(--c09l)','var(--c09d)'],'Mamá':['var(--c00l)','var(--c00d)'],
+  'Finanzas':['var(--c01l)','var(--c01d)'],'Salud':['var(--c02l)','var(--c02d)'],
+  'Hogar':['var(--c04l)','var(--c04d)'],'Matas':['var(--c05l)','var(--c05d)'],
+};
+const CATMAPT={
+  'Matemáticas':['var(--c09l)','var(--c09d)'],'Español':['var(--c07l)','var(--c07d)'],
+  'Ciencias':['var(--c03l)','var(--c03d)'],'Sociales':['var(--c04l)','var(--c04d)'],
+  'Educación física':['var(--c05l)','var(--c05d)'],'Arte':['var(--c08l)','var(--c08d)'],
+  'Personal':['var(--ctl)','var(--ctd)'],
+};
+
+// Login
+function selProfile(p){
+  selP=p;
+  document.querySelectorAll('.pcard').forEach(c=>c.style.transform='');
+  document.getElementById('c'+p).style.transform='translateY(-3px)';
+  document.getElementById('pinsec').style.display='block';
+  document.getElementById('pinlbl').textContent=p==='lf'?'PIN de Luisa Fernanda':'PIN de Tomás (pide a mamá)';
+  pinIn='';updatePinDots();
+}
+function addPin(d){
+  if(pinIn.length>=4)return;
+  pinIn+=d;updatePinDots();
+  if(pinIn.length===4)setTimeout(()=>enterApp(selP),200);
+}
+function clearPin(){pinIn=pinIn.slice(0,-1);updatePinDots();}
+function updatePinDots(){document.querySelectorAll('.pdot').forEach((d,i)=>d.classList.toggle('filled',i<pinIn.length));}
+function skipPin(){if(selP)enterApp(selP);}
+function enterApp(p){
+  activeP=p;
+  document.getElementById('login').style.display='none';
+  const a=document.getElementById('app');a.classList.add('on');
+  setView(p);renderAll();
+}
+function logout(){
+  document.getElementById('app').classList.remove('on');
+  document.getElementById('login').style.display='flex';
+  document.getElementById('pinsec').style.display='none';
+  document.querySelectorAll('.pcard').forEach(c=>c.style.transform='');
+  selP='';pinIn='';
+}
+
+// Switch
+function switchTo(p){activeP=p;setView(p);}
+function setView(p){
+  document.getElementById('vlf').classList.toggle('hidden',p!=='lf');
+  document.getElementById('vt').classList.toggle('hidden',p!=='t');
+  const alf=document.getElementById('avlf'),at=document.getElementById('avt');
+  alf.className='tav'+(p==='lf'?' alf':'');
+  at.className='tav'+(p==='t'?' at':'');
+  const pill=document.getElementById('iapill');
+  pill.style.background=p==='lf'?'var(--c02l)':'var(--ctl)';
+  pill.style.color=p==='lf'?'var(--c02d)':'var(--ctd)';
+  document.getElementById('iapulse').style.background=p==='lf'?'var(--c02d)':'var(--ctd)';
+  document.getElementById('iatext').textContent=p==='lf'?'IA activa':'Modo Tomás';
+  document.getElementById('scr').scrollTop=0;
+}
+
+// Calendar
+function renderCal(){
+  document.getElementById('calmonth').textContent=MONTHS[cm]+' '+cy;
+  const dn=document.getElementById('calDn');
+  dn.innerHTML=DN.map(d=>`<div class="mcdn">${d}</div>`).join('');
+  const grid=document.getElementById('calGrid');
+  const first=new Date(cy,cm,1).getDay();
+  const days=new Date(cy,cm+1,0).getDate();
+  const prevD=new Date(cy,cm,0).getDate();
+  let h='';
+  for(let i=0;i<first;i++)h+=`<div class="mcd om">${prevD-first+1+i}</div>`;
+  for(let d=1;d<=days;d++){
+    const isToday=d===25&&cm===2&&cy===2026;
+    const isSel=d===sd&&!isToday;
+    const evs=EVS[d]||[];
+    const dots=evs.slice(0,3).map(e=>`<div class="edot" style="background:${e.col}"></div>`).join('');
+    h+=`<div class="mcd${isToday?' today':''}${isSel?' sel':''}" onclick="selDay(${d})">${d}<div class="edots">${dots}</div></div>`;
+  }
+  const rem=7-((first+days)%7||7);
+  for(let i=1;i<=rem&&rem<7;i++)h+=`<div class="mcd om">${i}</div>`;
+  grid.innerHTML=h;
+  renderDayEvs(sd);
+}
+function selDay(d){sd=d;renderCal();}
+function renderDayEvs(d){
+  const date=new Date(cy,cm,d);
+  const lbl=(d===25&&cm===2?'Hoy · ':'')+DNF[date.getDay()]+' '+d;
+  document.getElementById('evTitle').textContent=lbl;
+  const evs=EVS[d]||[];
+  document.getElementById('evList').innerHTML=evs.length
+    ?evs.map(e=>`<div class="evrow"><div class="evtime">${e.t}</div><div class="evblock" style="background:${e.bg};color:${e.col}">${e.l}<span class="evtag">${e.tag}</span></div></div>`).join('')
+    :'<div style="font-size:12px;color:var(--muted);padding:6px 0">Sin eventos agendados</div>';
+}
+function changeMonth(dir){
+  cm+=dir;
+  if(cm<0){cm=11;cy--;}if(cm>11){cm=0;cy++;}
+  renderCal();
+}
+
+// Tasks LF
+function renderTasksLF(){
+  let items=TLF;
+  if(tf==='pend')items=items.filter(t=>!t.done);
+  if(tf==='done')items=items.filter(t=>t.done);
+  document.getElementById('tasklist').innerHTML=items.map((t,i)=>{
+    const ri=TLF.indexOf(t);
+    return `<div class="ti" onclick="togLF(${ri})">
+      <div class="tck${t.done?' done':''}" style="${t.done?'background:var(--c05);border-color:var(--c05)':''}"></div>
+      <div style="flex:1">
+        <div class="tlbl${t.done?' done':''}">${t.t}</div>
+        <div style="display:flex;gap:4px;align-items:center;margin-top:2px">
+          <span class="tchip" style="background:${t.cb};color:${t.cc}">${t.c}</span>
+          ${t.p==='alta'?'<span style="font-size:9px;padding:1px 5px;border-radius:4px;background:#FAEAEA;color:#8B3A3A">urgente</span>':''}
+        </div>
+      </div></div>`;}).join('');
+}
+function togLF(i){TLF[i].done=!TLF[i].done;renderTasksLF();renderSup();}
+function ftask(el,f){
+  el.closest('.tabs').querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');tf=f;renderTasksLF();
+}
+
+// Tasks Tomás
+function renderTasksT(){
+  const pend=TT.filter(t=>!t.done).length;
+  document.getElementById('tcnt').textContent=pend;
+  document.getElementById('tlistt').innerHTML=TT.map((t,i)=>`
+    <div class="ttask${t.done?' tdone':''}" onclick="togT(${i})">
+      <div class="tcbig${t.done?' done':''}" style="${t.done?'background:var(--ctd)':'border-color:var(--ct)'}"></div>
+      <div class="tlblt${t.done?' done':''}" style="flex:1">${t.t}</div>
+      <span class="tsubj" style="background:${t.cb};color:${t.cc}">${t.c}</span>
+    </div>`).join('');
+}
+function togT(i){TT[i].done=!TT[i].done;renderTasksT();renderSup();}
+
+// Events Tomás
+function renderEvsT(){
+  document.getElementById('tevlist').innerHTML=EVT.map(e=>`
+    <div class="tev">
+      <div class="tevtime">${e.t}</div>
+      <div class="tevdot" style="background:${e.col}"></div>
+      <div class="tevlbl">${e.l}</div>
+    </div>`).join('');
+}
+
+// Supervisión
+function renderSup(){
+  const done=TT.filter(t=>t.done).length,total=TT.length;
+  document.getElementById('supervision').innerHTML=`
+    <div style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--c00d);margin-bottom:3px">
+        <span>Tareas completadas hoy</span><span style="font-weight:500">${done}/${total}</span>
+      </div>
+      <div style="height:5px;background:white;border-radius:10px;overflow:hidden">
+        <div style="width:${Math.round(done/total*100)}%;height:100%;background:var(--c00);border-radius:10px;transition:width 0.4s"></div>
+      </div>
+    </div>
+    ${TT.map(t=>`<div style="display:flex;align-items:center;gap:7px;font-size:12px;color:var(--c00d);margin-bottom:4px">
+      <span>${t.done?'✅':'⬜'}</span>
+      <span style="flex:1">${t.t}</span>
+      <span style="font-size:9px;background:${t.cb};color:${t.cc};padding:1px 6px;border-radius:4px">${t.c}</span>
+    </div>`).join('')}
+    <div style="margin-top:7px;font-size:11px;color:var(--c00d);opacity:0.7">⚽ Partido de fútbol · sábado 10am</div>`;
+}
+
+// Modules click
+function renderMods(){
+  document.getElementById('modsGrid').innerHTML=MODS.map(m=>`
+    <div class="modcard" style="background:${m.bg};border-color:${m.bd};color:${m.co}" onclick="openMod('${m.n}')">
+      <div class="modnum">${m.n}</div>
+      <div class="modico">${m.i}</div>
+      <div class="modname">${m.nm}</div>
+      <div class="modct">${m.ct}</div>
+    </div>`).join('');
+}
+
+function openMod(num){
+  const mod=MODS.find(m=>m.n===num);
+  if(!mod)return;
+  document.getElementById('modsheet-title').innerHTML=`<span style="margin-right:8px">${mod.i}</span>${mod.nm}`;
+  document.getElementById('modsheet').style.borderTop=`3px solid ${mod.bd}`;
+  let body='';
+  if(num==='00') body=renderMapa();
+  else body=`<div style="text-align:center;padding:40px 20px;color:var(--muted)">
+    <div style="font-size:40px;margin-bottom:12px">${mod.i}</div>
+    <div style="font-size:15px;font-weight:500;color:var(--text);margin-bottom:6px">${mod.nm}</div>
+    <div style="font-size:13px;margin-bottom:20px">Este módulo está en construcción. Lo trabajamos juntas paso a paso. 🌿</div>
+    <div style="font-size:12px;opacity:0.6">Próximo módulo: ${mod.nm}</div>
+  </div>`;
+  document.getElementById('modsheet-body').innerHTML=body;
+  document.getElementById('modovl').classList.add('open');
+}
+
+function closeModModal(e){
+  if(!e||e.target===document.getElementById('modovl'))
+    document.getElementById('modovl').classList.remove('open');
+}
+
+function renderMapa(){
+  return `
+  <div class="norte-card">
+    <div class="norte-year">2026 es el año de la estabilidad con crecimiento sostenido</div>
+    <div class="norte-text">No sacrificio extremo · No exigencia rígida · No decisiones impulsivas por ansiedad</div>
+    <div class="norte-sub">Cuando me sienta perdida, vuelvo aquí.</div>
+  </div>
+
+  <div class="section-title">Los 4 ejes de vida</div>
+
+  <div class="eje-card" style="background:var(--c01l);border-color:var(--c01);color:var(--c01d)">
+    <div class="eje-title">💰 Finanzas</div>
+    <div class="eje-cols">
+      <div>
+        <div class="eje-col-title">Activo ahora</div>
+        <div class="eje-item">Organización financiera básica y visible</div>
+        <div class="eje-item">Control mensual simple</div>
+        <div class="eje-item">Uso consciente de cesantías</div>
+      </div>
+      <div>
+        <div class="eje-col-title">En pausa consciente</div>
+        <div class="eje-item">Ahorro estructurado rígido</div>
+        <div class="eje-item">Cancelación acelerada de deudas</div>
+      </div>
+      <div>
+        <div class="eje-col-title">Futuro</div>
+        <div class="eje-item">Optimización financiera</div>
+        <div class="eje-item">Metas de largo plazo</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="eje-card" style="background:var(--c03l);border-color:var(--c03);color:var(--c03d)">
+    <div class="eje-title">🧠 Trabajo / Estudio</div>
+    <div class="eje-cols">
+      <div>
+        <div class="eje-col-title">Activo ahora</div>
+        <div class="eje-item">Especialización en Psicología Jurídica</div>
+        <div class="eje-item">Organización laboral 2026</div>
+      </div>
+      <div>
+        <div class="eje-col-title">En pausa consciente</div>
+        <div class="eje-item">Consultorio privado (estructura sin presión)</div>
+        <div class="eje-item">Aumento de carga asistencial</div>
+      </div>
+      <div>
+        <div class="eje-col-title">Futuro</div>
+        <div class="eje-item">Ejercicio profesional especializado</div>
+        <div class="eje-item">Crecimiento del consultorio</div>
+        <div class="eje-item">Agenda 2027</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="eje-card" style="background:var(--c02l);border-color:var(--c02);color:var(--c02d)">
+    <div class="eje-title">🩺 Vida / Salud</div>
+    <div class="eje-cols">
+      <div>
+        <div class="eje-col-title">Activo ahora</div>
+        <div class="eje-item">Regulación emocional</div>
+        <div class="eje-item">Rutinas suaves y realistas</div>
+        <div class="eje-item">Cuidado de energía</div>
+      </div>
+      <div>
+        <div class="eje-col-title">En pausa consciente</div>
+        <div class="eje-item">Metas de peso estrictas</div>
+        <div class="eje-item">Hábitos rígidos</div>
+      </div>
+      <div>
+        <div class="eje-col-title">Futuro</div>
+        <div class="eje-item">Bienestar físico estable</div>
+        <div class="eje-item">Mejora sostenida de salud</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="eje-card" style="background:var(--c05l);border-color:var(--c05);color:var(--c05d)">
+    <div class="eje-title">🌱 Placer / Hobbies</div>
+    <div class="eje-cols">
+      <div>
+        <div class="eje-col-title">Activo ahora</div>
+        <div class="eje-item">Cuidado de matas 🌿</div>
+        <div class="eje-item">Espacios de calma y disfrute</div>
+      </div>
+      <div>
+        <div class="eje-col-title">En pausa consciente</div>
+        <div class="eje-item">Nuevos hobbies exigentes</div>
+      </div>
+      <div>
+        <div class="eje-col-title">Futuro</div>
+        <div class="eje-item">Profundizar placer sin presión</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Ritmo del año</div>
+  <div class="ritmo-grid">
+    <div class="ritmo-item"><div class="ritmo-mes">Ene – Feb</div><div class="ritmo-desc">Estabilizar, ordenar, adaptarme</div></div>
+    <div class="ritmo-item"><div class="ritmo-mes">Mar – Jun</div><div class="ritmo-desc">Sostener lo que ya está funcionando</div></div>
+    <div class="ritmo-item"><div class="ritmo-mes">Jul – Ago</div><div class="ritmo-desc">Revisar sin juicio</div></div>
+    <div class="ritmo-item"><div class="ritmo-mes">Sep – Dic</div><div class="ritmo-desc">Ajustar y cerrar</div></div>
+  </div>
+
+  <div class="section-title">Revisión semanal (máx. 20 min)</div>
+  <div style="margin-bottom:14px">
+    <div class="rev-step"><div class="rev-num">1</div><span>Leo el Norte del año</span></div>
+    <div class="rev-step"><div class="rev-num">2</div><span>Reviso los 4 ejes</span></div>
+    <div class="rev-step"><div class="rev-num">3</div><span>Me pregunto: ¿Esto sigue en el lugar correcto — Activo, Pausa o Futuro?</span></div>
+  </div>
+  <div style="font-size:11px;color:var(--muted);margin-bottom:16px">No se ejecuta. No se decide. No se juzga.</div>
+
+  <div class="section-title">Frases ancla</div>
+  <div style="background:var(--bg);border-radius:var(--r-md);padding:4px 14px;margin-bottom:16px">
+    <div class="frase-item">No todo se decide ahora</div>
+    <div class="frase-item">Avanzar despacio también es avanzar</div>
+    <div class="frase-item">Este mapa me sostiene, no me exige</div>
+    <div class="frase-item">Puedo cambiar de opinión sin fallar</div>
+  </div>
+
+  <div style="text-align:center;font-size:12px;color:var(--muted);padding-bottom:8px;font-style:italic">
+    🧭 Este documento está vivo. Yo también.
+  </div>`;
+}
+
+// Matas
+function renderMatas(){
+  document.getElementById('matasGrid').innerHTML=MATAS.map(m=>`
+    <div class="matacard">
+      <div class="mataem">${m.e}</div>
+      <div class="matanm">${m.n}</div>
+      ${m.w?`<div class="mataw">${m.w}</div>`:''}
+    </div>`).join('');
+}
+
+// Modals
+function openModal(){document.getElementById('modal').classList.add('open');document.getElementById('minput').focus();}
+function closeModal(){document.getElementById('modal').classList.remove('open');}
+function addTaskLF(){
+  const v=document.getElementById('minput').value.trim();if(!v)return;
+  const c=document.getElementById('mcat').value;
+  const [cb,cc]=CATMAP[c]||['var(--bg)','var(--text)'];
+  TLF.unshift({t:v,c,cb,cc,done:false,p:'normal'});
+  document.getElementById('minput').value='';
+  closeModal();renderTasksLF();
+}
+function openModalT(){document.getElementById('modalt').classList.add('open');document.getElementById('mtinput').focus();}
+function closeModalT(){document.getElementById('modalt').classList.remove('open');}
+function addTaskT(){
+  const v=document.getElementById('mtinput').value.trim();if(!v)return;
+  const c=document.getElementById('mtcat').value;
+  const [cb,cc]=CATMAPT[c]||['var(--ctl)','var(--ctd)'];
+  TT.unshift({t:v,c,cb,cc,done:false});
+  document.getElementById('mtinput').value='';
+  closeModalT();renderTasksT();renderSup();
+}
+
+document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+document.getElementById('modalt').addEventListener('click',function(e){if(e.target===this)closeModalT();});
+
+function renderAll(){
+  renderCal();renderTasksLF();renderTasksT();renderEvsT();renderSup();renderMods();renderMatas();
+}
+</script>
+</body>
+</html>
