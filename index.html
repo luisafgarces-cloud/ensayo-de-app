@@ -4,9 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="MiVida">
 <title>MiVida — Luisa Fernanda & Tomás</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -24,6 +23,7 @@
   --bg:#F7F4F0;--surface:#FFFFFF;
   --text:#2C2820;--muted:#8C8680;
   --border:rgba(44,40,32,0.09);--border-md:rgba(44,40,32,0.15);
+  --success:#3A5C44;--warning:#C97E3A;--danger:#8B3A3A;
   --r-sm:8px;--r-md:12px;--r-lg:18px;
   --shadow:0 1px 3px rgba(44,40,32,0.07),0 4px 12px rgba(44,40,32,0.04);
 }
@@ -418,13 +418,15 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
           <div class="srow2"><span class="slbl">Ansiedad</span><div class="bw"><div class="bf" style="width:28%;background:var(--c05)"></div></div><span class="bval" style="color:var(--c05d)">baja</span></div>
           <div style="margin-top:8px;font-size:11px;color:var(--c02d);opacity:0.7">💊 Medicación: ✓ tomada hoy</div>
         </div>
-        <div class="card" style="border-color:var(--c01)">
+        <div class="card" style="border-color:var(--c01)" id="finanzasCard">
           <div class="chd"><span class="ctitle" style="color:var(--c01d)">01 · Finanzas</span></div>
-          <div class="fr"><span class="flbl">Hospital</span><span class="fpos">+$3.200k</span></div>
-          <div class="fr"><span class="flbl">Consultorio</span><span class="fpos">+$1.800k</span></div>
-          <div class="fr"><span class="flbl">Especialización</span><span class="fneg">-$980k</span></div>
-          <div class="fr"><span class="flbl">Hogar + Tomás</span><span class="fneg">-$1.500k</span></div>
-          <div class="fr" style="border-top:1px solid var(--c01);padding-top:6px;margin-top:2px"><span class="flbl" style="font-weight:500;color:var(--text)">Disponible</span><span class="fpos" style="font-size:14px">$2.520k</span></div>
+          <div id="finanzasPreview">
+            <div class="fr"><span class="flbl">Ingresos mes</span><span class="fpos" id="previewIngresos">$3.890.222</span></div>
+            <div class="fr"><span class="flbl">Gastos mes</span><span class="fneg" id="previewGastos">$0</span></div>
+            <div class="fr"><span class="flbl">Disponible</span><span id="previewDisponible" style="font-weight:500">$3.890.222</span></div>
+            <div class="fr"><span class="flbl">Crédito Cotrafa</span><span>termina jul</span></div>
+          </div>
+          <button class="addbtn" onclick="abrirModuloFinanzas()" style="margin-top:10px">📊 Ver módulo completo →</button>
         </div>
         <div class="card" style="border-color:var(--c05);background:var(--c05l)">
           <div class="chd"><span class="ctitle" style="color:var(--c05d)">05 · Mis matas 🌿</span></div>
@@ -547,6 +549,19 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
   </div>
 </div>
 
+<!-- MODAL FINANZAS (módulo completo) -->
+<div class="modovl" id="finanzasModal" onclick="closeFinanzasModal(event)">
+  <div class="modsheet" style="max-width: 800px;">
+    <div class="modsheet-header">
+      <div class="modsheet-title">💰 01 · Finanzas</div>
+      <button class="modsheet-close" onclick="closeFinanzasModal()">×</button>
+    </div>
+    <div class="modsheet-body" id="finanzasBody">
+      <!-- El contenido de finanzas se carga dinámicamente -->
+    </div>
+  </div>
+</div>
+
 <!-- MODAL LF -->
 <div class="movl" id="modal">
   <div class="msheet">
@@ -575,10 +590,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 </div>
 
 <script>
-const MONTHS=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-const DN=['do','lu','ma','mi','ju','vi','sá'];
-const DNF=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
-
+// ==================== DATOS PRINCIPALES ====================
 let activeP='lf', selP='', pinIn='';
 let cy=2026, cm=2, sd=25, tf='todas';
 
@@ -655,353 +667,343 @@ const CATMAPT={
   'Personal':['var(--ctl)','var(--ctd)'],
 };
 
-// Login
-function selProfile(p){
-  selP=p;
-  document.querySelectorAll('.pcard').forEach(c=>c.style.transform='');
-  document.getElementById('c'+p).style.transform='translateY(-3px)';
-  document.getElementById('pinsec').style.display='block';
-  document.getElementById('pinlbl').textContent=p==='lf'?'PIN de Luisa Fernanda':'PIN de Tomás (pide a mamá)';
-  pinIn='';updatePinDots();
-}
-function addPin(d){
-  if(pinIn.length>=4)return;
-  pinIn+=d;updatePinDots();
-  if(pinIn.length===4)setTimeout(()=>enterApp(selP),200);
-}
-function clearPin(){pinIn=pinIn.slice(0,-1);updatePinDots();}
-function updatePinDots(){document.querySelectorAll('.pdot').forEach((d,i)=>d.classList.toggle('filled',i<pinIn.length));}
-function skipPin(){if(selP)enterApp(selP);}
-function enterApp(p){
-  activeP=p;
-  document.getElementById('login').style.display='none';
-  const a=document.getElementById('app');a.classList.add('on');
-  setView(p);renderAll();
-}
-function logout(){
-  document.getElementById('app').classList.remove('on');
-  document.getElementById('login').style.display='flex';
-  document.getElementById('pinsec').style.display='none';
-  document.querySelectorAll('.pcard').forEach(c=>c.style.transform='');
-  selP='';pinIn='';
-}
+// ==================== DATOS DE FINANZAS ====================
+let transacciones = [
+  { id: Date.now()+1, tipo: 'ingreso', desc: 'Prosalud', monto: 1580864, categoria: 'ingreso', fecha: '2026-03-05' },
+  { id: Date.now()+2, tipo: 'ingreso', desc: 'Hospital', monto: 2309358, categoria: 'ingreso', fecha: '2026-03-15' },
+  { id: Date.now()+3, tipo: 'gasto', desc: 'Arriendo', monto: 850000, categoria: 'vital', fecha: '2026-03-05' },
+  { id: Date.now()+4, tipo: 'gasto', desc: 'Servicios', monto: 180000, categoria: 'vital', fecha: '2026-03-10' },
+  { id: Date.now()+5, tipo: 'gasto', desc: 'Mercado', monto: 320000, categoria: 'vital', fecha: '2026-03-15' },
+  { id: Date.now()+6, tipo: 'gasto', desc: 'Medicación Tomás', monto: 45000, categoria: 'importante', fecha: '2026-03-12' },
+  { id: Date.now()+7, tipo: 'gasto', desc: 'Ropa', monto: 120000, categoria: 'postergable', fecha: '2026-03-18' },
+];
 
-// Switch
-function switchTo(p){activeP=p;setView(p);}
-function setView(p){
-  document.getElementById('vlf').classList.toggle('hidden',p!=='lf');
-  document.getElementById('vt').classList.toggle('hidden',p!=='t');
-  const alf=document.getElementById('avlf'),at=document.getElementById('avt');
-  alf.className='tav'+(p==='lf'?' alf':'');
-  at.className='tav'+(p==='t'?' at':'');
-  const pill=document.getElementById('iapill');
-  pill.style.background=p==='lf'?'var(--c02l)':'var(--ctl)';
-  pill.style.color=p==='lf'?'var(--c02d)':'var(--ctd)';
-  document.getElementById('iapulse').style.background=p==='lf'?'var(--c02d)':'var(--ctd)';
-  document.getElementById('iatext').textContent=p==='lf'?'IA activa':'Modo Tomás';
-  document.getElementById('scr').scrollTop=0;
-}
+let pagosProgramados = [
+  { id: 1, nombre: 'Arriendo', monto: 850000, dia: 5 },
+  { id: 2, nombre: 'Crédito Cotrafa', monto: 350000, dia: 10 },
+  { id: 3, nombre: 'Servicios públicos', monto: 180000, dia: 15 },
+  { id: 4, nombre: 'Internet', monto: 72000, dia: 20 },
+];
 
-// Calendar
-function renderCal(){
-  document.getElementById('calmonth').textContent=MONTHS[cm]+' '+cy;
-  const dn=document.getElementById('calDn');
-  dn.innerHTML=DN.map(d=>`<div class="mcdn">${d}</div>`).join('');
-  const grid=document.getElementById('calGrid');
-  const first=new Date(cy,cm,1).getDay();
-  const days=new Date(cy,cm+1,0).getDate();
-  const prevD=new Date(cy,cm,0).getDate();
-  let h='';
-  for(let i=0;i<first;i++)h+=`<div class="mcd om">${prevD-first+1+i}</div>`;
-  for(let d=1;d<=days;d++){
-    const isToday=d===25&&cm===2&&cy===2026;
-    const isSel=d===sd&&!isToday;
-    const evs=EVS[d]||[];
-    const dots=evs.slice(0,3).map(e=>`<div class="edot" style="background:${e.col}"></div>`).join('');
-    h+=`<div class="mcd${isToday?' today':''}${isSel?' sel':''}" onclick="selDay(${d})">${d}<div class="edots">${dots}</div></div>`;
+let revisionMensual = { mes: new Date().getMonth(), año: new Date().getFullYear(), revisado: false };
+let ingresosBase = { prosalud: 1580864, hospital: 2309358, total: 3890222 };
+
+// ==================== FUNCIONES PRINCIPALES ====================
+function cargarDatosFinanzas() {
+  const saved = localStorage.getItem('mivida_finanzas');
+  if(saved) {
+    const data = JSON.parse(saved);
+    transacciones = data.transacciones || transacciones;
+    pagosProgramados = data.pagosProgramados || pagosProgramados;
+    revisionMensual = data.revisionMensual || revisionMensual;
   }
-  const rem=7-((first+days)%7||7);
-  for(let i=1;i<=rem&&rem<7;i++)h+=`<div class="mcd om">${i}</div>`;
-  grid.innerHTML=h;
-  renderDayEvs(sd);
-}
-function selDay(d){sd=d;renderCal();}
-function renderDayEvs(d){
-  const date=new Date(cy,cm,d);
-  const lbl=(d===25&&cm===2?'Hoy · ':'')+DNF[date.getDay()]+' '+d;
-  document.getElementById('evTitle').textContent=lbl;
-  const evs=EVS[d]||[];
-  document.getElementById('evList').innerHTML=evs.length
-    ?evs.map(e=>`<div class="evrow"><div class="evtime">${e.t}</div><div class="evblock" style="background:${e.bg};color:${e.col}">${e.l}<span class="evtag">${e.tag}</span></div></div>`).join('')
-    :'<div style="font-size:12px;color:var(--muted);padding:6px 0">Sin eventos agendados</div>';
-}
-function changeMonth(dir){
-  cm+=dir;
-  if(cm<0){cm=11;cy--;}if(cm>11){cm=0;cy++;}
-  renderCal();
+  const hoy = new Date();
+  if(revisionMensual.mes !== hoy.getMonth() || revisionMensual.año !== hoy.getFullYear()) {
+    revisionMensual = { mes: hoy.getMonth(), año: hoy.getFullYear(), revisado: false };
+    guardarDatosFinanzas();
+  }
+  actualizarPreviewFinanzas();
 }
 
-// Tasks LF
-function renderTasksLF(){
-  let items=TLF;
-  if(tf==='pend')items=items.filter(t=>!t.done);
-  if(tf==='done')items=items.filter(t=>t.done);
-  document.getElementById('tasklist').innerHTML=items.map((t,i)=>{
-    const ri=TLF.indexOf(t);
-    return `<div class="ti" onclick="togLF(${ri})">
-      <div class="tck${t.done?' done':''}" style="${t.done?'background:var(--c05);border-color:var(--c05)':''}"></div>
-      <div style="flex:1">
-        <div class="tlbl${t.done?' done':''}">${t.t}</div>
-        <div style="display:flex;gap:4px;align-items:center;margin-top:2px">
-          <span class="tchip" style="background:${t.cb};color:${t.cc}">${t.c}</span>
-          ${t.p==='alta'?'<span style="font-size:9px;padding:1px 5px;border-radius:4px;background:#FAEAEA;color:#8B3A3A">urgente</span>':''}
+function guardarDatosFinanzas() {
+  localStorage.setItem('mivida_finanzas', JSON.stringify({ transacciones, pagosProgramados, revisionMensual }));
+}
+
+function obtenerTransaccionesMes() {
+  const hoy = new Date();
+  const mes = hoy.getMonth();
+  const año = hoy.getFullYear();
+  return transacciones.filter(t => {
+    const fecha = new Date(t.fecha);
+    return fecha.getMonth() === mes && fecha.getFullYear() === año;
+  });
+}
+
+function calcularResumenFinanzas() {
+  const transaccionesMes = obtenerTransaccionesMes();
+  const ingresos = transaccionesMes.filter(t => t.tipo === 'ingreso').reduce((s, t) => s + t.monto, 0);
+  const gastos = transaccionesMes.filter(t => t.tipo === 'gasto').reduce((s, t) => s + t.monto, 0);
+  const gastosPorNivel = {
+    vital: transaccionesMes.filter(t => t.tipo === 'gasto' && t.categoria === 'vital').reduce((s, t) => s + t.monto, 0),
+    importante: transaccionesMes.filter(t => t.tipo === 'gasto' && t.categoria === 'importante').reduce((s, t) => s + t.monto, 0),
+    postergable: transaccionesMes.filter(t => t.tipo === 'gasto' && t.categoria === 'postergable').reduce((s, t) => s + t.monto, 0)
+  };
+  const totalGastos = gastosPorNivel.vital + gastosPorNivel.importante + gastosPorNivel.postergable;
+  const ingresosMostrar = ingresos > 0 ? ingresos : ingresosBase.total;
+  return { ingresos: ingresosMostrar, gastos: totalGastos, disponible: ingresosMostrar - totalGastos, gastosPorNivel };
+}
+
+function actualizarPreviewFinanzas() {
+  const res = calcularResumenFinanzas();
+  document.getElementById('previewIngresos').innerHTML = '$' + res.ingresos.toLocaleString('es-CO');
+  document.getElementById('previewGastos').innerHTML = '$' + res.gastos.toLocaleString('es-CO');
+  const disponibleEl = document.getElementById('previewDisponible');
+  disponibleEl.innerHTML = '$' + res.disponible.toLocaleString('es-CO');
+  disponibleEl.style.color = res.disponible >= 0 ? 'var(--success)' : 'var(--danger)';
+}
+
+function abrirModuloFinanzas() {
+  document.getElementById('finanzasModal').classList.add('open');
+  renderFinanzasCompleto();
+}
+
+function closeFinanzasModal(e) {
+  if(!e || e.target === document.getElementById('finanzasModal') || e.target.classList?.contains('modsheet-close')) {
+    document.getElementById('finanzasModal').classList.remove('open');
+  }
+}
+
+function renderFinanzasCompleto() {
+  const res = calcularResumenFinanzas();
+  const transaccionesMes = obtenerTransaccionesMes();
+  const hoy = new Date();
+  const diaHoy = hoy.getDate();
+  const mesNumero = hoy.getMonth();
+  
+  const gastosPorNivel = res.gastosPorNivel;
+  const totalGastos = gastosPorNivel.vital + gastosPorNivel.importante + gastosPorNivel.postergable;
+  const pct3 = totalGastos ? Math.round(gastosPorNivel.postergable / totalGastos * 100) : 0;
+  
+  const progresoCotrafa = Math.min(100, Math.round((mesNumero + 1) / 7 * 100));
+  const liberacionPct = mesNumero >= 6 ? 100 : Math.round((mesNumero + 1) / 7 * 100);
+  
+  const pagosProximos = pagosProgramados.filter(p => p.dia >= diaHoy && p.dia <= diaHoy + 5);
+  
+  const html = `
+    <div style="margin-bottom:20px">
+      <div style="background:var(--c09l);border-radius:var(--r-lg);padding:16px;text-align:center;margin-bottom:16px">
+        <div style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--c09d)">🌱 "Hasta julio me sostengo. Después de julio construyo."</div>
+      </div>
+      
+      <div class="kpi-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">
+        <div class="kpi" style="background:var(--bg);border-radius:var(--r-md);padding:14px;text-align:center">
+          <div style="font-size:10px;color:var(--muted)">Ingresos del mes</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:28px">$${res.ingresos.toLocaleString('es-CO')}</div>
+          <div style="font-size:10px;color:var(--muted)">base: $3.890.222 desde feb</div>
         </div>
-      </div></div>`;}).join('');
-}
-function togLF(i){TLF[i].done=!TLF[i].done;renderTasksLF();renderSup();}
-function ftask(el,f){
-  el.closest('.tabs').querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');tf=f;renderTasksLF();
-}
-
-// Tasks Tomás
-function renderTasksT(){
-  const pend=TT.filter(t=>!t.done).length;
-  document.getElementById('tcnt').textContent=pend;
-  document.getElementById('tlistt').innerHTML=TT.map((t,i)=>`
-    <div class="ttask${t.done?' tdone':''}" onclick="togT(${i})">
-      <div class="tcbig${t.done?' done':''}" style="${t.done?'background:var(--ctd)':'border-color:var(--ct)'}"></div>
-      <div class="tlblt${t.done?' done':''}" style="flex:1">${t.t}</div>
-      <span class="tsubj" style="background:${t.cb};color:${t.cc}">${t.c}</span>
-    </div>`).join('');
-}
-function togT(i){TT[i].done=!TT[i].done;renderTasksT();renderSup();}
-
-// Events Tomás
-function renderEvsT(){
-  document.getElementById('tevlist').innerHTML=EVT.map(e=>`
-    <div class="tev">
-      <div class="tevtime">${e.t}</div>
-      <div class="tevdot" style="background:${e.col}"></div>
-      <div class="tevlbl">${e.l}</div>
-    </div>`).join('');
-}
-
-// Supervisión
-function renderSup(){
-  const done=TT.filter(t=>t.done).length,total=TT.length;
-  document.getElementById('supervision').innerHTML=`
-    <div style="margin-bottom:8px">
-      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--c00d);margin-bottom:3px">
-        <span>Tareas completadas hoy</span><span style="font-weight:500">${done}/${total}</span>
+        <div class="kpi" style="background:var(--bg);border-radius:var(--r-md);padding:14px;text-align:center">
+          <div style="font-size:10px;color:var(--muted)">Gastos del mes</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:28px">$${res.gastos.toLocaleString('es-CO')}</div>
+        </div>
+        <div class="kpi" style="background:var(--bg);border-radius:var(--r-md);padding:14px;text-align:center">
+          <div style="font-size:10px;color:var(--muted)">Disponible</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:28px;color:${res.disponible >= 0 ? 'var(--success)' : 'var(--danger)'}">$${res.disponible.toLocaleString('es-CO')}</div>
+        </div>
       </div>
-      <div style="height:5px;background:white;border-radius:10px;overflow:hidden">
-        <div style="width:${Math.round(done/total*100)}%;height:100%;background:var(--c00);border-radius:10px;transition:width 0.4s"></div>
+      
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header" style="display:flex;justify-content:space-between;margin-bottom:12px">
+          <span class="card-title">💰 Crédito Cotrafa</span>
+          <span class="badge">termina junio/julio 2026</span>
+        </div>
+        <div class="progress-container" style="margin:8px 0">
+          <div class="progress-label" style="display:flex;justify-content:space-between;font-size:12px"><span>Progreso</span><span>${progresoCotrafa}%</span></div>
+          <div class="progress-bar" style="height:8px;background:var(--border);border-radius:10px"><div class="progress-fill" style="width:${progresoCotrafa}%;height:100%;background:var(--c01d);border-radius:10px"></div></div>
+        </div>
+        <div class="progress-container" style="margin:8px 0">
+          <div class="progress-label" style="display:flex;justify-content:space-between;font-size:12px"><span>💰 $669.204 que se liberarán</span><span>${liberacionPct}%</span></div>
+          <div class="progress-bar" style="height:8px;background:var(--border);border-radius:10px"><div class="progress-fill" style="width:${liberacionPct}%;height:100%;background:var(--c05d);border-radius:10px"></div></div>
+        </div>
+        <div class="text-muted text-center" style="margin-top:8px;font-size:11px">⚡ Regla: No adelantos, no renegociaciones este semestre</div>
       </div>
-    </div>
-    ${TT.map(t=>`<div style="display:flex;align-items:center;gap:7px;font-size:12px;color:var(--c00d);margin-bottom:4px">
-      <span>${t.done?'✅':'⬜'}</span>
-      <span style="flex:1">${t.t}</span>
-      <span style="font-size:9px;background:${t.cb};color:${t.cc};padding:1px 6px;border-radius:4px">${t.c}</span>
-    </div>`).join('')}
-    <div style="margin-top:7px;font-size:11px;color:var(--c00d);opacity:0.7">⚽ Partido de fútbol · sábado 10am</div>`;
-}
-
-// Modules click
-function renderMods(){
-  document.getElementById('modsGrid').innerHTML=MODS.map(m=>`
-    <div class="modcard" style="background:${m.bg};border-color:${m.bd};color:${m.co}" onclick="openMod('${m.n}')">
-      <div class="modnum">${m.n}</div>
-      <div class="modico">${m.i}</div>
-      <div class="modname">${m.nm}</div>
-      <div class="modct">${m.ct}</div>
-    </div>`).join('');
-}
-
-function openMod(num){
-  const mod=MODS.find(m=>m.n===num);
-  if(!mod)return;
-  document.getElementById('modsheet-title').innerHTML=`<span style="margin-right:8px">${mod.i}</span>${mod.nm}`;
-  document.getElementById('modsheet').style.borderTop=`3px solid ${mod.bd}`;
-  let body='';
-  if(num==='00') body=renderMapa();
-  else body=`<div style="text-align:center;padding:40px 20px;color:var(--muted)">
-    <div style="font-size:40px;margin-bottom:12px">${mod.i}</div>
-    <div style="font-size:15px;font-weight:500;color:var(--text);margin-bottom:6px">${mod.nm}</div>
-    <div style="font-size:13px;margin-bottom:20px">Este módulo está en construcción. Lo trabajamos juntas paso a paso. 🌿</div>
-    <div style="font-size:12px;opacity:0.6">Próximo módulo: ${mod.nm}</div>
-  </div>`;
-  document.getElementById('modsheet-body').innerHTML=body;
-  document.getElementById('modovl').classList.add('open');
-}
-
-function closeModModal(e){
-  if(!e||e.target===document.getElementById('modovl'))
-    document.getElementById('modovl').classList.remove('open');
-}
-
-function renderMapa(){
-  return `
-  <div class="norte-card">
-    <div class="norte-year">2026 es el año de la estabilidad con crecimiento sostenido</div>
-    <div class="norte-text">No sacrificio extremo · No exigencia rígida · No decisiones impulsivas por ansiedad</div>
-    <div class="norte-sub">Cuando me sienta perdida, vuelvo aquí.</div>
-  </div>
-
-  <div class="section-title">Los 4 ejes de vida</div>
-
-  <div class="eje-card" style="background:var(--c01l);border-color:var(--c01);color:var(--c01d)">
-    <div class="eje-title">💰 Finanzas</div>
-    <div class="eje-cols">
-      <div>
-        <div class="eje-col-title">Activo ahora</div>
-        <div class="eje-item">Organización financiera básica y visible</div>
-        <div class="eje-item">Control mensual simple</div>
-        <div class="eje-item">Uso consciente de cesantías</div>
+      
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header" style="display:flex;justify-content:space-between;margin-bottom:12px">
+          <span class="card-title">🧾 Prioridad de gasto</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+          <div style="background:var(--c03l);border-radius:var(--r-md);padding:12px;text-align:center">
+            <div style="font-size:11px;font-weight:600;color:var(--c03d)">Nivel 1 · Vitales</div>
+            <div style="font-size:20px;font-weight:500">$${gastosPorNivel.vital.toLocaleString('es-CO')}</div>
+            <div style="font-size:11px;color:var(--muted)">${totalGastos ? Math.round(gastosPorNivel.vital/totalGastos*100) : 0}%</div>
+          </div>
+          <div style="background:var(--c01l);border-radius:var(--r-md);padding:12px;text-align:center">
+            <div style="font-size:11px;font-weight:600;color:var(--c01d)">Nivel 2 · Importantes</div>
+            <div style="font-size:20px;font-weight:500">$${gastosPorNivel.importante.toLocaleString('es-CO')}</div>
+            <div style="font-size:11px;color:var(--muted)">${totalGastos ? Math.round(gastosPorNivel.importante/totalGastos*100) : 0}%</div>
+          </div>
+          <div style="background:var(--c09l);border-radius:var(--r-md);padding:12px;text-align:center">
+            <div style="font-size:11px;font-weight:600;color:var(--c09d)">Nivel 3 · Postergables</div>
+            <div style="font-size:20px;font-weight:500">$${gastosPorNivel.postergable.toLocaleString('es-CO')}</div>
+            <div style="font-size:11px;color:var(--muted)">${pct3}%</div>
+          </div>
+        </div>
+        ${pct3 > 15 ? `<div class="alert-warning" style="margin-top:12px;padding:8px;border-radius:8px;font-size:12px">⚠️ Estás gastando más del 15% en nivel 3. Recuerda: nada del nivel 3 se decide en ansiedad.</div>` : ''}
       </div>
-      <div>
-        <div class="eje-col-title">En pausa consciente</div>
-        <div class="eje-item">Ahorro estructurado rígido</div>
-        <div class="eje-item">Cancelación acelerada de deudas</div>
+      
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header" style="display:flex;justify-content:space-between;margin-bottom:12px">
+          <span class="card-title">📅 Pagos programados</span>
+          <button class="btn-sm" style="padding:4px 10px;border:1px solid var(--border-md);border-radius:8px;background:none;cursor:pointer" onclick="agregarPagoProgramadoPrompt()">+ agregar</button>
+        </div>
+        <div id="pagosListCompleto">
+          ${pagosProgramados.map(p => `
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+              <span style="flex:1"><strong>${p.nombre}</strong></span>
+              <span>$${p.monto.toLocaleString('es-CO')}</span>
+              <span style="width:60px;text-align:center">día ${p.dia}</span>
+              <button class="btn-icon" onclick="eliminarPagoProgramado(${p.id})" style="background:none;border:none;cursor:pointer">🗑️</button>
+            </div>
+          `).join('')}
+          ${pagosProgramados.length === 0 ? '<div class="text-muted text-center" style="padding:16px">No hay pagos programados</div>' : ''}
+        </div>
+        ${pagosProximos.length > 0 ? `<div class="alert" style="margin-top:12px;background:var(--c01l);padding:8px;border-radius:8px;font-size:12px">⏰ Próximos pagos: ${pagosProximos.map(p => `${p.nombre} (día ${p.dia})`).join(', ')}</div>` : ''}
       </div>
-      <div>
-        <div class="eje-col-title">Futuro</div>
-        <div class="eje-item">Optimización financiera</div>
-        <div class="eje-item">Metas de largo plazo</div>
+      
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header" style="display:flex;justify-content:space-between;margin-bottom:12px">
+          <span class="card-title">📋 Movimientos del mes</span>
+          <div style="display:flex;gap:6px">
+            <button class="btn-sm" style="padding:4px 10px;border:1px solid var(--c03d);border-radius:8px;background:var(--c03l);cursor:pointer" onclick="agregarTransaccion('ingreso')">+ ingreso</button>
+            <button class="btn-sm" style="padding:4px 10px;border:1px solid var(--c09d);border-radius:8px;background:var(--c09l);cursor:pointer" onclick="agregarTransaccion('gasto')">+ gasto</button>
+          </div>
+        </div>
+        <div id="transaccionesListCompleto">
+          ${transaccionesMes.sort((a,b) => new Date(b.fecha) - new Date(a.fecha)).map(t => `
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+              <div style="flex:2">
+                <div style="font-weight:500">${t.desc}</div>
+                <div style="font-size:10px;color:var(--muted)">${t.fecha} · ${t.categoria === 'vital' ? 'N1 Vital' : t.categoria === 'importante' ? 'N2 Importante' : 'N3 Postergable'}</div>
+              </div>
+              <div style="font-weight:600;color:${t.tipo === 'ingreso' ? 'var(--success)' : 'var(--danger)'}">${t.tipo === 'ingreso' ? '+' : '-'}$${t.monto.toLocaleString('es-CO')}</div>
+              <button class="btn-icon" onclick="eliminarTransaccion(${t.id})" style="background:none;border:none;cursor:pointer;margin-left:8px">🗑️</button>
+            </div>
+          `).join('')}
+          ${transaccionesMes.length === 0 ? '<div class="text-muted text-center" style="padding:20px">No hay movimientos este mes</div>' : ''}
+        </div>
+      </div>
+      
+      <div class="card" style="background:var(--c01l)">
+        <div class="card-header" style="display:flex;justify-content:space-between;margin-bottom:12px">
+          <span class="card-title">📆 Revisión mensual</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+          <span>¿Revisaste tus finanzas este mes?</span>
+          <div style="display:flex;gap:8px">
+            <button class="btn-sm" style="padding:4px 12px;background:var(--c03d);color:white;border:none;border-radius:8px;cursor:pointer" onclick="marcarRevisionMensual(true)">✅ sí</button>
+            <button class="btn-sm" style="padding:4px 12px;border:1px solid var(--border-md);border-radius:8px;background:none;cursor:pointer" onclick="marcarRevisionMensual(false)">🔘 no aún</button>
+          </div>
+        </div>
+        <div class="text-muted" style="margin-top:8px;font-size:12px">${revisionMensual.revisado ? '✓ Revisión realizada este mes. ¡Bien!' : '🌱 Una revisión al mes, sin castigo si no se hace.'}</div>
+      </div>
+      
+      <div style="margin-top:16px;text-align:center;font-size:12px;color:var(--muted);font-style:italic;padding:12px">
+        🧘‍♀️ No estás atrasada, estás en transición. Una transición bien sostenida vale más que mil planes perfectos.
       </div>
     </div>
-  </div>
-
-  <div class="eje-card" style="background:var(--c03l);border-color:var(--c03);color:var(--c03d)">
-    <div class="eje-title">🧠 Trabajo / Estudio</div>
-    <div class="eje-cols">
-      <div>
-        <div class="eje-col-title">Activo ahora</div>
-        <div class="eje-item">Especialización en Psicología Jurídica</div>
-        <div class="eje-item">Organización laboral 2026</div>
-      </div>
-      <div>
-        <div class="eje-col-title">En pausa consciente</div>
-        <div class="eje-item">Consultorio privado (estructura sin presión)</div>
-        <div class="eje-item">Aumento de carga asistencial</div>
-      </div>
-      <div>
-        <div class="eje-col-title">Futuro</div>
-        <div class="eje-item">Ejercicio profesional especializado</div>
-        <div class="eje-item">Crecimiento del consultorio</div>
-        <div class="eje-item">Agenda 2027</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="eje-card" style="background:var(--c02l);border-color:var(--c02);color:var(--c02d)">
-    <div class="eje-title">🩺 Vida / Salud</div>
-    <div class="eje-cols">
-      <div>
-        <div class="eje-col-title">Activo ahora</div>
-        <div class="eje-item">Regulación emocional</div>
-        <div class="eje-item">Rutinas suaves y realistas</div>
-        <div class="eje-item">Cuidado de energía</div>
-      </div>
-      <div>
-        <div class="eje-col-title">En pausa consciente</div>
-        <div class="eje-item">Metas de peso estrictas</div>
-        <div class="eje-item">Hábitos rígidos</div>
-      </div>
-      <div>
-        <div class="eje-col-title">Futuro</div>
-        <div class="eje-item">Bienestar físico estable</div>
-        <div class="eje-item">Mejora sostenida de salud</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="eje-card" style="background:var(--c05l);border-color:var(--c05);color:var(--c05d)">
-    <div class="eje-title">🌱 Placer / Hobbies</div>
-    <div class="eje-cols">
-      <div>
-        <div class="eje-col-title">Activo ahora</div>
-        <div class="eje-item">Cuidado de matas 🌿</div>
-        <div class="eje-item">Espacios de calma y disfrute</div>
-      </div>
-      <div>
-        <div class="eje-col-title">En pausa consciente</div>
-        <div class="eje-item">Nuevos hobbies exigentes</div>
-      </div>
-      <div>
-        <div class="eje-col-title">Futuro</div>
-        <div class="eje-item">Profundizar placer sin presión</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="section-title">Ritmo del año</div>
-  <div class="ritmo-grid">
-    <div class="ritmo-item"><div class="ritmo-mes">Ene – Feb</div><div class="ritmo-desc">Estabilizar, ordenar, adaptarme</div></div>
-    <div class="ritmo-item"><div class="ritmo-mes">Mar – Jun</div><div class="ritmo-desc">Sostener lo que ya está funcionando</div></div>
-    <div class="ritmo-item"><div class="ritmo-mes">Jul – Ago</div><div class="ritmo-desc">Revisar sin juicio</div></div>
-    <div class="ritmo-item"><div class="ritmo-mes">Sep – Dic</div><div class="ritmo-desc">Ajustar y cerrar</div></div>
-  </div>
-
-  <div class="section-title">Revisión semanal (máx. 20 min)</div>
-  <div style="margin-bottom:14px">
-    <div class="rev-step"><div class="rev-num">1</div><span>Leo el Norte del año</span></div>
-    <div class="rev-step"><div class="rev-num">2</div><span>Reviso los 4 ejes</span></div>
-    <div class="rev-step"><div class="rev-num">3</div><span>Me pregunto: ¿Esto sigue en el lugar correcto — Activo, Pausa o Futuro?</span></div>
-  </div>
-  <div style="font-size:11px;color:var(--muted);margin-bottom:16px">No se ejecuta. No se decide. No se juzga.</div>
-
-  <div class="section-title">Frases ancla</div>
-  <div style="background:var(--bg);border-radius:var(--r-md);padding:4px 14px;margin-bottom:16px">
-    <div class="frase-item">No todo se decide ahora</div>
-    <div class="frase-item">Avanzar despacio también es avanzar</div>
-    <div class="frase-item">Este mapa me sostiene, no me exige</div>
-    <div class="frase-item">Puedo cambiar de opinión sin fallar</div>
-  </div>
-
-  <div style="text-align:center;font-size:12px;color:var(--muted);padding-bottom:8px;font-style:italic">
-    🧭 Este documento está vivo. Yo también.
-  </div>`;
+  `;
+  
+  document.getElementById('finanzasBody').innerHTML = html;
 }
 
-// Matas
-function renderMatas(){
-  document.getElementById('matasGrid').innerHTML=MATAS.map(m=>`
-    <div class="matacard">
-      <div class="mataem">${m.e}</div>
-      <div class="matanm">${m.n}</div>
-      ${m.w?`<div class="mataw">${m.w}</div>`:''}
-    </div>`).join('');
+function agregarTransaccion(tipo) {
+  const desc = prompt('Descripción:');
+  if(!desc) return;
+  const monto = parseFloat(prompt('Monto ($):'));
+  if(isNaN(monto)) return;
+  let categoria = 'vital';
+  if(tipo === 'gasto') {
+    const catOpt = prompt('Categoría: 1=Vital, 2=Importante, 3=Postergable');
+    if(catOpt === '2') categoria = 'importante';
+    else if(catOpt === '3') categoria = 'postergable';
+    else categoria = 'vital';
+  } else {
+    categoria = 'ingreso';
+  }
+  const fecha = prompt('Fecha (YYYY-MM-DD):', new Date().toISOString().slice(0,10));
+  if(!fecha) return;
+  
+  const nueva = {
+    id: Date.now(),
+    tipo: tipo,
+    desc: desc,
+    monto: monto,
+    categoria: categoria,
+    fecha: fecha
+  };
+  transacciones.unshift(nueva);
+  guardarDatosFinanzas();
+  actualizarPreviewFinanzas();
+  renderFinanzasCompleto();
 }
 
-// Modals
-function openModal(){document.getElementById('modal').classList.add('open');document.getElementById('minput').focus();}
-function closeModal(){document.getElementById('modal').classList.remove('open');}
-function addTaskLF(){
-  const v=document.getElementById('minput').value.trim();if(!v)return;
-  const c=document.getElementById('mcat').value;
-  const [cb,cc]=CATMAP[c]||['var(--bg)','var(--text)'];
-  TLF.unshift({t:v,c,cb,cc,done:false,p:'normal'});
-  document.getElementById('minput').value='';
-  closeModal();renderTasksLF();
-}
-function openModalT(){document.getElementById('modalt').classList.add('open');document.getElementById('mtinput').focus();}
-function closeModalT(){document.getElementById('modalt').classList.remove('open');}
-function addTaskT(){
-  const v=document.getElementById('mtinput').value.trim();if(!v)return;
-  const c=document.getElementById('mtcat').value;
-  const [cb,cc]=CATMAPT[c]||['var(--ctl)','var(--ctd)'];
-  TT.unshift({t:v,c,cb,cc,done:false});
-  document.getElementById('mtinput').value='';
-  closeModalT();renderTasksT();renderSup();
+function eliminarTransaccion(id) {
+  transacciones = transacciones.filter(t => t.id !== id);
+  guardarDatosFinanzas();
+  actualizarPreviewFinanzas();
+  renderFinanzasCompleto();
 }
 
+function agregarPagoProgramadoPrompt() {
+  const nombre = prompt('Nombre del pago (ej: Arriendo):');
+  if(!nombre) return;
+  const monto = parseFloat(prompt('Monto ($):'));
+  if(isNaN(monto)) return;
+  const dia = parseInt(prompt('Día de vencimiento (1-31):'));
+  if(isNaN(dia) || dia < 1 || dia > 31) return;
+  
+  const nuevo = {
+    id: Date.now(),
+    nombre: nombre,
+    monto: monto,
+    dia: dia
+  };
+  pagosProgramados.push(nuevo);
+  guardarDatosFinanzas();
+  actualizarPreviewFinanzas();
+  renderFinanzasCompleto();
+}
+
+function eliminarPagoProgramado(id) {
+  pagosProgramados = pagosProgramados.filter(p => p.id !== id);
+  guardarDatosFinanzas();
+  actualizarPreviewFinanzas();
+  renderFinanzasCompleto();
+}
+
+function marcarRevisionMensual(valor) {
+  revisionMensual.revisado = valor;
+  guardarDatosFinanzas();
+  renderFinanzasCompleto();
+}
+
+// ==================== FUNCIONES ORIGINALES DE LA APP ====================
+function selProfile(p){ selP=p; document.querySelectorAll('.pcard').forEach(c=>c.style.transform=''); document.getElementById('c'+p).style.transform='translateY(-3px)'; document.getElementById('pinsec').style.display='block'; document.getElementById('pinlbl').textContent=p==='lf'?'PIN de Luisa Fernanda':'PIN de Tomás (pide a mamá)'; pinIn=''; updatePinDots(); }
+function addPin(d){ if(pinIn.length>=4)return; pinIn+=d; updatePinDots(); if(pinIn.length===4)setTimeout(()=>enterApp(selP),200); }
+function clearPin(){ pinIn=pinIn.slice(0,-1); updatePinDots(); }
+function updatePinDots(){ document.querySelectorAll('.pdot').forEach((d,i)=>d.classList.toggle('filled',i<pinIn.length)); }
+function skipPin(){ if(selP)enterApp(selP); }
+function enterApp(p){ activeP=p; document.getElementById('login').style.display='none'; const a=document.getElementById('app'); a.classList.add('on'); setView(p); renderAll(); }
+function logout(){ document.getElementById('app').classList.remove('on'); document.getElementById('login').style.display='flex'; document.getElementById('pinsec').style.display='none'; document.querySelectorAll('.pcard').forEach(c=>c.style.transform=''); selP=''; pinIn=''; }
+function switchTo(p){ activeP=p; setView(p); }
+function setView(p){ document.getElementById('vlf').classList.toggle('hidden',p!=='lf'); document.getElementById('vt').classList.toggle('hidden',p!=='t'); const alf=document.getElementById('avlf'),at=document.getElementById('avt'); alf.className='tav'+(p==='lf'?' alf':''); at.className='tav'+(p==='t'?' at':''); const pill=document.getElementById('iapill'); pill.style.background=p==='lf'?'var(--c02l)':'var(--ctl)'; pill.style.color=p==='lf'?'var(--c02d)':'var(--ctd)'; document.getElementById('iapulse').style.background=p==='lf'?'var(--c02d)':'var(--ctd)'; document.getElementById('iatext').textContent=p==='lf'?'IA activa':'Modo Tomás'; document.getElementById('scr').scrollTop=0; }
+function renderCal(){ document.getElementById('calmonth').textContent=MONTHS[cm]+' '+cy; const dn=document.getElementById('calDn'); dn.innerHTML=DN.map(d=>`<div class="mcdn">${d}</div>`).join(''); const grid=document.getElementById('calGrid'); const first=new Date(cy,cm,1).getDay(); const days=new Date(cy,cm+1,0).getDate(); const prevD=new Date(cy,cm,0).getDate(); let h=''; for(let i=0;i<first;i++)h+=`<div class="mcd om">${prevD-first+1+i}</div>`; for(let d=1;d<=days;d++){ const isToday=d===25&&cm===2&&cy===2026; const isSel=d===sd&&!isToday; const evs=EVS[d]||[]; const dots=evs.slice(0,3).map(e=>`<div class="edot" style="background:${e.col}"></div>`).join(''); h+=`<div class="mcd${isToday?' today':''}${isSel?' sel':''}" onclick="selDay(${d})">${d}<div class="edots">${dots}</div></div>`; } const rem=7-((first+days)%7||7); for(let i=1;i<=rem&&rem<7;i++)h+=`<div class="mcd om">${i}</div>`; grid.innerHTML=h; renderDayEvs(sd); }
+function selDay(d){ sd=d; renderCal(); }
+function renderDayEvs(d){ const date=new Date(cy,cm,d); const lbl=(d===25&&cm===2?'Hoy · ':'')+DNF[date.getDay()]+' '+d; document.getElementById('evTitle').textContent=lbl; const evs=EVS[d]||[]; document.getElementById('evList').innerHTML=evs.length ?evs.map(e=>`<div class="evrow"><div class="evtime">${e.t}</div><div class="evblock" style="background:${e.bg};color:${e.col}">${e.l}<span class="evtag">${e.tag}</span></div></div>`).join('') :'<div style="font-size:12px;color:var(--muted);padding:6px 0">Sin eventos agendados</div>'; }
+function changeMonth(dir){ cm+=dir; if(cm<0){cm=11;cy--;}if(cm>11){cm=0;cy++;} renderCal(); }
+function renderTasksLF(){ let items=TLF; if(tf==='pend')items=items.filter(t=>!t.done); if(tf==='done')items=items.filter(t=>t.done); document.getElementById('tasklist').innerHTML=items.map((t,i)=>{ const ri=TLF.indexOf(t); return `<div class="ti" onclick="togLF(${ri})"><div class="tck${t.done?' done':''}" style="${t.done?'background:var(--c05);border-color:var(--c05)':''}"></div><div style="flex:1"><div class="tlbl${t.done?' done':''}">${t.t}</div><div style="display:flex;gap:4px;align-items:center;margin-top:2px"><span class="tchip" style="background:${t.cb};color:${t.cc}">${t.c}</span>${t.p==='alta'?'<span style="font-size:9px;padding:1px 5px;border-radius:4px;background:#FAEAEA;color:#8B3A3A">urgente</span>':''}</div></div></div>`; }).join(''); }
+function togLF(i){ TLF[i].done=!TLF[i].done; renderTasksLF(); renderSup(); }
+function ftask(el,f){ el.closest('.tabs').querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); el.classList.add('active'); tf=f; renderTasksLF(); }
+function renderTasksT(){ const pend=TT.filter(t=>!t.done).length; document.getElementById('tcnt').textContent=pend; document.getElementById('tlistt').innerHTML=TT.map((t,i)=>`<div class="ttask${t.done?' tdone':''}" onclick="togT(${i})"><div class="tcbig${t.done?' done':''}" style="${t.done?'background:var(--ctd)':'border-color:var(--ct)'}"></div><div class="tlblt${t.done?' done':''}" style="flex:1">${t.t}</div><span class="tsubj" style="background:${t.cb};color:${t.cc}">${t.c}</span></div>`).join(''); }
+function togT(i){ TT[i].done=!TT[i].done; renderTasksT(); renderSup(); }
+function renderEvsT(){ document.getElementById('tevlist').innerHTML=EVT.map(e=>`<div class="tev"><div class="tevtime">${e.t}</div><div class="tevdot" style="background:${e.col}"></div><div class="tevlbl">${e.l}</div></div>`).join(''); }
+function renderSup(){ const done=TT.filter(t=>t.done).length,total=TT.length; document.getElementById('supervision').innerHTML=`<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--c00d);margin-bottom:3px"><span>Tareas completadas hoy</span><span style="font-weight:500">${done}/${total}</span></div><div style="height:5px;background:white;border-radius:10px;overflow:hidden"><div style="width:${Math.round(done/total*100)}%;height:100%;background:var(--c00);border-radius:10px;transition:width 0.4s"></div></div></div>${TT.map(t=>`<div style="display:flex;align-items:center;gap:7px;font-size:12px;color:var(--c00d);margin-bottom:4px"><span>${t.done?'✅':'⬜'}</span><span style="flex:1">${t.t}</span><span style="font-size:9px;background:${t.cb};color:${t.cc};padding:1px 6px;border-radius:4px">${t.c}</span></div>`).join('')}<div style="margin-top:7px;font-size:11px;color:var(--c00d);opacity:0.7">⚽ Partido de fútbol · sábado 10am</div>`; }
+function renderMods(){ document.getElementById('modsGrid').innerHTML=MODS.map(m=>`<div class="modcard" style="background:${m.bg};border-color:${m.bd};color:${m.co}" onclick="openMod('${m.n}')"><div class="modnum">${m.n}</div><div class="modico">${m.i}</div><div class="modname">${m.nm}</div><div class="modct">${m.ct}</div></div>`).join(''); }
+function openMod(num){ const mod=MODS.find(m=>m.n===num); if(!mod)return; document.getElementById('modsheet-title').innerHTML=`<span style="margin-right:8px">${mod.i}</span>${mod.nm}`; document.getElementById('modsheet').style.borderTop=`3px solid ${mod.bd}`; let body=''; if(num==='00') body=renderMapa(); else if(num==='01') { abrirModuloFinanzas(); closeModModal(); return; } else body=`<div style="text-align:center;padding:40px 20px;color:var(--muted)"><div style="font-size:40px;margin-bottom:12px">${mod.i}</div><div style="font-size:15px;font-weight:500;color:var(--text);margin-bottom:6px">${mod.nm}</div><div style="font-size:13px;margin-bottom:20px">Este módulo está en construcción. Lo trabajamos juntas paso a paso. 🌿</div><div style="font-size:12px;opacity:0.6">Próximo módulo: ${mod.nm}</div></div>`; document.getElementById('modsheet-body').innerHTML=body; document.getElementById('modovl').classList.add('open'); }
+function closeModModal(e){ if(!e||e.target===document.getElementById('modovl')) document.getElementById('modovl').classList.remove('open'); }
+function renderMapa(){ return `<div class="norte-card"><div class="norte-year">2026 es el año de la estabilidad con crecimiento sostenido</div><div class="norte-text">No sacrificio extremo · No exigencia rígida · No decisiones impulsivas por ansiedad</div><div class="norte-sub">Cuando me sienta perdida, vuelvo aquí.</div></div><div class="section-title">Los 4 ejes de vida</div><div class="eje-card" style="background:var(--c01l);border-color:var(--c01);color:var(--c01d)"><div class="eje-title">💰 Finanzas</div><div class="eje-cols"><div><div class="eje-col-title">Activo ahora</div><div class="eje-item">Organización financiera básica y visible</div><div class="eje-item">Control mensual simple</div><div class="eje-item">Uso consciente de cesantías</div></div><div><div class="eje-col-title">En pausa consciente</div><div class="eje-item">Ahorro estructurado rígido</div><div class="eje-item">Cancelación acelerada de deudas</div></div><div><div class="eje-col-title">Futuro</div><div class="eje-item">Optimización financiera</div><div class="eje-item">Metas de largo plazo</div></div></div></div><div class="eje-card" style="background:var(--c03l);border-color:var(--c03);color:var(--c03d)"><div class="eje-title">🧠 Trabajo / Estudio</div><div class="eje-cols"><div><div class="eje-col-title">Activo ahora</div><div class="eje-item">Especialización en Psicología Jurídica</div><div class="eje-item">Organización laboral 2026</div></div><div><div class="eje-col-title">En pausa consciente</div><div class="eje-item">Consultorio privado (estructura sin presión)</div><div class="eje-item">Aumento de carga asistencial</div></div><div><div class="eje-col-title">Futuro</div><div class="eje-item">Ejercicio profesional especializado</div><div class="eje-item">Crecimiento del consultorio</div><div class="eje-item">Agenda 2027</div></div></div></div><div class="eje-card" style="background:var(--c02l);border-color:var(--c02);color:var(--c02d)"><div class="eje-title">🩺 Vida / Salud</div><div class="eje-cols"><div><div class="eje-col-title">Activo ahora</div><div class="eje-item">Regulación emocional</div><div class="eje-item">Rutinas suaves y realistas</div><div class="eje-item">Cuidado de energía</div></div><div><div class="eje-col-title">En pausa consciente</div><div class="eje-item">Metas de peso estrictas</div><div class="eje-item">Hábitos rígidos</div></div><div><div class="eje-col-title">Futuro</div><div class="eje-item">Bienestar físico estable</div><div class="eje-item">Mejora sostenida de salud</div></div></div></div><div class="eje-card" style="background:var(--c05l);border-color:var(--c05);color:var(--c05d)"><div class="eje-title">🌱 Placer / Hobbies</div><div class="eje-cols"><div><div class="eje-col-title">Activo ahora</div><div class="eje-item">Cuidado de matas 🌿</div><div class="eje-item">Espacios de calma y disfrute</div></div><div><div class="eje-col-title">En pausa consciente</div><div class="eje-item">Nuevos hobbies exigentes</div></div><div><div class="eje-col-title">Futuro</div><div class="eje-item">Profundizar placer sin presión</div></div></div></div><div class="section-title">Ritmo del año</div><div class="ritmo-grid"><div class="ritmo-item"><div class="ritmo-mes">Ene – Feb</div><div class="ritmo-desc">Estabilizar, ordenar, adaptarme</div></div><div class="ritmo-item"><div class="ritmo-mes">Mar – Jun</div><div class="ritmo-desc">Sostener lo que ya está funcionando</div></div><div class="ritmo-item"><div class="ritmo-mes">Jul – Ago</div><div class="ritmo-desc">Revisar sin juicio</div></div><div class="ritmo-item"><div class="ritmo-mes">Sep – Dic</div><div class="ritmo-desc">Ajustar y cerrar</div></div></div><div class="section-title">Revisión semanal (máx. 20 min)</div><div style="margin-bottom:14px"><div class="rev-step"><div class="rev-num">1</div><span>Leo el Norte del año</span></div><div class="rev-step"><div class="rev-num">2</div><span>Reviso los 4 ejes</span></div><div class="rev-step"><div class="rev-num">3</div><span>Me pregunto: ¿Esto sigue en el lugar correcto — Activo, Pausa o Futuro?</span></div></div><div style="font-size:11px;color:var(--muted);margin-bottom:16px">No se ejecuta. No se decide. No se juzga.</div><div class="section-title">Frases ancla</div><div style="background:var(--bg);border-radius:var(--r-md);padding:4px 14px;margin-bottom:16px"><div class="frase-item">No todo se decide ahora</div><div class="frase-item">Avanzar despacio también es avanzar</div><div class="frase-item">Este mapa me sostiene, no me exige</div><div class="frase-item">Puedo cambiar de opinión sin fallar</div></div><div style="text-align:center;font-size:12px;color:var(--muted);padding-bottom:8px;font-style:italic">🧭 Este documento está vivo. Yo también.</div>`; }
+function renderMatas(){ document.getElementById('matasGrid').innerHTML=MATAS.map(m=>`<div class="matacard"><div class="mataem">${m.e}</div><div class="matanm">${m.n}</div>${m.w?`<div class="mataw">${m.w}</div>`:''}</div>`).join(''); }
+function openModal(){ document.getElementById('modal').classList.add('open'); document.getElementById('minput').focus(); }
+function closeModal(){ document.getElementById('modal').classList.remove('open'); }
+function addTaskLF(){ const v=document.getElementById('minput').value.trim(); if(!v)return; const c=document.getElementById('mcat').value; const [cb,cc]=CATMAP[c]||['var(--bg)','var(--text)']; TLF.unshift({t:v,c,cb,cc,done:false,p:'normal'}); document.getElementById('minput').value=''; closeModal(); renderTasksLF(); }
+function openModalT(){ document.getElementById('modalt').classList.add('open'); document.getElementById('mtinput').focus(); }
+function closeModalT(){ document.getElementById('modalt').classList.remove('open'); }
+function addTaskT(){ const v=document.getElementById('mtinput').value.trim(); if(!v)return; const c=document.getElementById('mtcat').value; const [cb,cc]=CATMAPT[c]||['var(--ctl)','var(--ctd)']; TT.unshift({t:v,c,cb,cc,done:false}); document.getElementById('mtinput').value=''; closeModalT(); renderTasksT(); renderSup(); }
 document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
 document.getElementById('modalt').addEventListener('click',function(e){if(e.target===this)closeModalT();});
-
-function renderAll(){
-  renderCal();renderTasksLF();renderTasksT();renderEvsT();renderSup();renderMods();renderMatas();
-}
+function renderAll(){ renderCal(); renderTasksLF(); renderTasksT(); renderEvsT(); renderSup(); renderMods(); renderMatas(); actualizarPreviewFinanzas(); }
+cargarDatosFinanzas();
+renderAll();
 </script>
 </body>
 </html>
